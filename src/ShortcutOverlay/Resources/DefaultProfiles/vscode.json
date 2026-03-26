@@ -1,0 +1,63 @@
+{
+  "profileId": "vscode",
+  "displayName": "Visual Studio Code",
+  "processNames": ["Code"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Editor",
+      "shortcuts": [
+        { "keys": "Ctrl+S", "description": "Save file", "tags": ["save", "file"] },
+        { "keys": "Ctrl+Shift+S", "description": "Save as", "tags": ["save", "file"] },
+        { "keys": "Ctrl+K+S", "description": "Save all", "tags": ["save", "file"] },
+        { "keys": "Ctrl+N", "description": "New file", "tags": ["new", "file"] },
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "edit"] },
+        { "keys": "Ctrl+Shift+Z", "description": "Redo", "tags": ["redo", "edit"] },
+        { "keys": "Ctrl+X", "description": "Cut", "tags": ["cut", "edit"] },
+        { "keys": "Ctrl+C", "description": "Copy", "tags": ["copy", "edit"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["paste", "edit"] }
+      ]
+    },
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Ctrl+P", "description": "Quick open file", "tags": ["navigate", "file", "search"] },
+        { "keys": "Ctrl+G", "description": "Go to line", "tags": ["navigate", "line"] },
+        { "keys": "Ctrl+Shift+O", "description": "Go to symbol", "tags": ["navigate", "symbol"] },
+        { "keys": "Ctrl+Tab", "description": "Switch editor tab", "tags": ["navigate", "tab"] },
+        { "keys": "Alt+Left", "description": "Back", "tags": ["navigate", "history"] },
+        { "keys": "Alt+Right", "description": "Forward", "tags": ["navigate", "history"] }
+      ]
+    },
+    {
+      "name": "Search & Replace",
+      "shortcuts": [
+        { "keys": "Ctrl+F", "description": "Find", "tags": ["search", "find"] },
+        { "keys": "Ctrl+H", "description": "Find and replace", "tags": ["search", "replace"] },
+        { "keys": "Ctrl+Shift+F", "description": "Find in files", "tags": ["search", "find"] },
+        { "keys": "F3", "description": "Find next", "tags": ["search", "find"] },
+        { "keys": "Shift+F3", "description": "Find previous", "tags": ["search", "find"] }
+      ]
+    },
+    {
+      "name": "Terminal",
+      "shortcuts": [
+        { "keys": "Ctrl+Grave", "description": "Toggle terminal", "tags": ["terminal", "console"] },
+        { "keys": "Ctrl+Shift+Grave", "description": "Create new terminal", "tags": ["terminal", "console"] },
+        { "keys": "Ctrl+Shift+C", "description": "Copy terminal", "tags": ["terminal", "copy"] },
+        { "keys": "Ctrl+Shift+V", "description": "Paste terminal", "tags": ["terminal", "paste"] }
+      ]
+    },
+    {
+      "name": "Debug",
+      "shortcuts": [
+        { "keys": "F5", "description": "Start debugging", "tags": ["debug", "run"] },
+        { "keys": "F6", "description": "Stop debugging", "tags": ["debug", "run"] },
+        { "keys": "F9", "description": "Toggle breakpoint", "tags": ["debug", "breakpoint"] },
+        { "keys": "F10", "description": "Step over", "tags": ["debug", "step"] },
+        { "keys": "F11", "description": "Step into", "tags": ["debug", "step"] }
+      ]
+    }
+  ]
+}

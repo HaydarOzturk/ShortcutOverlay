@@ -1,0 +1,61 @@
+{
+  "profileId": "substance-painter",
+  "displayName": "Substance 3D Painter",
+  "processNames": ["Adobe Substance 3D Painter", "painter"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Tools",
+      "shortcuts": [
+        { "keys": "B", "description": "Brush tool", "tags": ["tool", "brush", "paint"] },
+        { "keys": "E", "description": "Eraser tool", "tags": ["tool", "eraser"] },
+        { "keys": "D", "description": "Clone tool", "tags": ["tool", "clone"] },
+        { "keys": "G", "description": "Fill tool", "tags": ["tool", "fill"] },
+        { "keys": "P", "description": "Blur tool", "tags": ["tool", "blur"] },
+        { "keys": "O", "description": "Smudge tool", "tags": ["tool", "smudge"] },
+        { "keys": "F", "description": "Projection tool", "tags": ["tool", "projection"] }
+      ]
+    },
+    {
+      "name": "Painting",
+      "shortcuts": [
+        { "keys": "ScrollWheel", "description": "Adjust brush size", "tags": ["painting", "brush", "size"] },
+        { "keys": "Ctrl+ScrollWheel", "description": "Adjust hardness", "tags": ["painting", "brush", "hardness"] },
+        { "keys": "Shift+ScrollWheel", "description": "Adjust opacity", "tags": ["painting", "brush", "opacity"] },
+        { "keys": "[", "description": "Decrease brush size", "tags": ["painting", "brush", "size"] },
+        { "keys": "]", "description": "Increase brush size", "tags": ["painting", "brush", "size"] },
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "edit"] }
+      ]
+    },
+    {
+      "name": "View",
+      "shortcuts": [
+        { "keys": "MiddleMouse+Drag", "description": "Rotate model", "tags": ["view", "rotate", "navigation"] },
+        { "keys": "Alt+LeftMouseDrag", "description": "Pan view", "tags": ["view", "pan", "navigation"] },
+        { "keys": "ScrollWheel", "description": "Zoom", "tags": ["view", "zoom"] },
+        { "keys": "1", "description": "Front view", "tags": ["view", "camera"] },
+        { "keys": "2", "description": "Top view", "tags": ["view", "camera"] },
+        { "keys": "3", "description": "Right view", "tags": ["view", "camera"] },
+        { "keys": "F", "description": "Frame all", "tags": ["view", "frame"] }
+      ]
+    },
+    {
+      "name": "Layers",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+N", "description": "New layer", "tags": ["layer", "new"] },
+        { "keys": "Ctrl+J", "description": "Duplicate layer", "tags": ["layer", "duplicate"] },
+        { "keys": "Delete", "description": "Delete layer", "tags": ["layer", "delete"] },
+        { "keys": "Ctrl+Up", "description": "Stack up", "tags": ["layer", "stack"] },
+        { "keys": "Ctrl+Down", "description": "Stack down", "tags": ["layer", "stack"] }
+      ]
+    },
+    {
+      "name": "Baking",
+      "shortcuts": [
+        { "keys": "Ctrl+B", "description": "Bake textures", "tags": ["bake", "texture"] },
+        { "keys": "Shift+B", "description": "Bake all maps", "tags": ["bake", "texture"] }
+      ]
+    }
+  ]
+}

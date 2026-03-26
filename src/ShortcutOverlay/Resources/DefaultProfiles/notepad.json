@@ -1,0 +1,45 @@
+{
+  "profileId": "notepad",
+  "displayName": "Notepad/Notepad++",
+  "processNames": ["notepad", "notepad++"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "File",
+      "shortcuts": [
+        { "keys": "Ctrl+N", "description": "New document", "tags": ["file", "new"] },
+        { "keys": "Ctrl+O", "description": "Open file", "tags": ["file", "open"] },
+        { "keys": "Ctrl+S", "description": "Save file", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Shift+S", "description": "Save as", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Alt+S", "description": "Save all", "tags": ["file", "save"] },
+        { "keys": "Ctrl+P", "description": "Print", "tags": ["file", "print"] },
+        { "keys": "Alt+F4", "description": "Close window", "tags": ["file", "close"] }
+      ]
+    },
+    {
+      "name": "Edit",
+      "shortcuts": [
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["edit", "undo"] },
+        { "keys": "Ctrl+Y", "description": "Redo", "tags": ["edit", "redo"] },
+        { "keys": "Ctrl+X", "description": "Cut", "tags": ["edit", "cut"] },
+        { "keys": "Ctrl+C", "description": "Copy", "tags": ["edit", "copy"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["edit", "paste"] },
+        { "keys": "Ctrl+A", "description": "Select all", "tags": ["edit", "select"] },
+        { "keys": "Ctrl+H", "description": "Find and replace", "tags": ["edit", "search"] },
+        { "keys": "Ctrl+F", "description": "Find", "tags": ["edit", "search"] }
+      ]
+    },
+    {
+      "name": "View",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+M", "description": "Maximize window", "tags": ["view", "window"] },
+        { "keys": "F11", "description": "Full screen", "tags": ["view", "fullscreen"] },
+        { "keys": "Ctrl+Tab", "description": "Next tab", "tags": ["view", "tab"] },
+        { "keys": "Ctrl+Shift+Tab", "description": "Previous tab", "tags": ["view", "tab"] },
+        { "keys": "Ctrl+Plus", "description": "Increase font", "tags": ["view", "zoom"] },
+        { "keys": "Ctrl+Minus", "description": "Decrease font", "tags": ["view", "zoom"] }
+      ]
+    }
+  ]
+}

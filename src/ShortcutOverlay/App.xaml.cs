@@ -10,6 +10,7 @@ namespace ShortcutOverlay;
 public partial class App : Application
 {
     public static IServiceProvider Services { get; private set; } = null!;
+    private TrayIconService? _trayIconService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -22,12 +23,15 @@ public partial class App : Application
         services.AddSingleton<ProfileManager>();
         services.AddSingleton<HotkeyService>();
         services.AddSingleton<SettingsService>();
+        services.AddSingleton<TrayIconService>();
 
         // Register view models
         services.AddSingleton<MainViewModel>();
 
         // Register views
         services.AddTransient<FloatingWidgetWindow>();
+        services.AddTransient<SidePanelWindow>();
+        services.AddTransient<TrayPopupWindow>();
 
         Services = services.BuildServiceProvider();
 
@@ -35,9 +39,13 @@ public partial class App : Application
         var detection = Services.GetRequiredService<WindowDetectionService>();
         detection.Start();
 
-        // Create and show the floating widget window
+        // Get the view model
+        var viewModel = Services.GetRequiredService<MainViewModel>();
+
+        // Create and show the floating widget window (default mode)
         var window = Services.GetRequiredService<FloatingWidgetWindow>();
         window.Show();
+        viewModel.ActiveOverlay = window;
 
         // Initialize hotkey service
         var hotkeyService = Services.GetRequiredService<HotkeyService>();
@@ -45,12 +53,21 @@ public partial class App : Application
         hotkeyService.RegisterToggleHotkey(Win32Api.MOD_CONTROL | Win32Api.MOD_SHIFT, 0x53); // Ctrl+Shift+S
 
         // Subscribe to toggle overlay requested event
-        hotkeyService.ToggleOverlayRequested += () => window.ToggleVisibility();
+        hotkeyService.ToggleOverlayRequested += () => viewModel.ActiveOverlay?.ToggleVisibility();
+
+        // Initialize system tray icon
+        _trayIconService = Services.GetRequiredService<TrayIconService>();
+        _trayIconService.Initialize();
+        _trayIconService.ToggleOverlayRequested += () => viewModel.ActiveOverlay?.ToggleVisibility();
+        _trayIconService.OpenSettingsRequested += () => viewModel.OpenSettingsCommand.Execute(null);
+        _trayIconService.QuitRequested += () => Shutdown();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         base.OnExit(e);
+
+        _trayIconService?.Dispose();
 
         if (Services is IAsyncDisposable asyncDisposable)
         {

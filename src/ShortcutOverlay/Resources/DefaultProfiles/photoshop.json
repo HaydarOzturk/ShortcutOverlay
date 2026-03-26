@@ -1,0 +1,72 @@
+{
+  "profileId": "photoshop",
+  "displayName": "Adobe Photoshop",
+  "processNames": ["Photoshop"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Tools",
+      "shortcuts": [
+        { "keys": "B", "description": "Brush tool", "tags": ["tool", "brush", "paint"] },
+        { "keys": "E", "description": "Eraser tool", "tags": ["tool", "eraser"] },
+        { "keys": "V", "description": "Move tool", "tags": ["tool", "move"] },
+        { "keys": "U", "description": "Shape tool", "tags": ["tool", "shape"] },
+        { "keys": "T", "description": "Text tool", "tags": ["tool", "text"] },
+        { "keys": "C", "description": "Crop tool", "tags": ["tool", "crop"] },
+        { "keys": "Z", "description": "Zoom tool", "tags": ["tool", "zoom"] },
+        { "keys": "H", "description": "Hand/Pan tool", "tags": ["tool", "navigate"] }
+      ]
+    },
+    {
+      "name": "Selection",
+      "shortcuts": [
+        { "keys": "M", "description": "Rectangular Select", "tags": ["selection", "select"] },
+        { "keys": "L", "description": "Lasso tool", "tags": ["selection", "select"] },
+        { "keys": "W", "description": "Magic Wand", "tags": ["selection", "select"] },
+        { "keys": "Ctrl+A", "description": "Select all", "tags": ["selection", "select"] },
+        { "keys": "Ctrl+D", "description": "Deselect", "tags": ["selection", "deselect"] },
+        { "keys": "Shift+Ctrl+I", "description": "Invert selection", "tags": ["selection", "invert"] }
+      ]
+    },
+    {
+      "name": "Layers",
+      "shortcuts": [
+        { "keys": "Ctrl+J", "description": "Duplicate layer", "tags": ["layer", "duplicate"] },
+        { "keys": "Ctrl+Shift+N", "description": "New layer", "tags": ["layer", "new"] },
+        { "keys": "Ctrl+E", "description": "Merge down", "tags": ["layer", "merge"] },
+        { "keys": "Ctrl+Alt+E", "description": "Merge visible", "tags": ["layer", "merge"] },
+        { "keys": "Ctrl+Shift+E", "description": "Flatten image", "tags": ["layer", "flatten"] }
+      ]
+    },
+    {
+      "name": "View",
+      "shortcuts": [
+        { "keys": "Ctrl+Plus", "description": "Zoom in", "tags": ["view", "zoom"] },
+        { "keys": "Ctrl+Minus", "description": "Zoom out", "tags": ["view", "zoom"] },
+        { "keys": "Ctrl+0", "description": "Fit in window", "tags": ["view", "zoom"] },
+        { "keys": "Ctrl+Alt+0", "description": "100% zoom", "tags": ["view", "zoom"] },
+        { "keys": "Tab", "description": "Toggle UI", "tags": ["view", "ui"] }
+      ]
+    },
+    {
+      "name": "File",
+      "shortcuts": [
+        { "keys": "Ctrl+N", "description": "New document", "tags": ["file", "new"] },
+        { "keys": "Ctrl+O", "description": "Open", "tags": ["file", "open"] },
+        { "keys": "Ctrl+S", "description": "Save", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Shift+S", "description": "Save As", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Alt+S", "description": "Save for Web", "tags": ["file", "save", "export"] }
+      ]
+    },
+    {
+      "name": "Edit",
+      "shortcuts": [
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "edit"] },
+        { "keys": "Ctrl+Shift+Z", "description": "Redo", "tags": ["redo", "edit"] },
+        { "keys": "Ctrl+T", "description": "Free transform", "tags": ["transform", "edit"] },
+        { "keys": "Ctrl+H", "description": "Transform again", "tags": ["transform", "edit"] }
+      ]
+    }
+  ]
+}

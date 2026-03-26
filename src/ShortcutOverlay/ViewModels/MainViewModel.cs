@@ -3,8 +3,16 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using ShortcutOverlay.Models;
 using ShortcutOverlay.Services;
+using ShortcutOverlay.Views;
 
 namespace ShortcutOverlay.ViewModels;
+
+public enum DisplayMode
+{
+    FloatingWidget,
+    SidePanel,
+    TrayPopup
+}
 
 public partial class MainViewModel : ObservableObject
 {
@@ -21,9 +29,17 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string searchFilter = string.Empty;
 
+    [ObservableProperty]
+    private DisplayMode currentDisplayMode = DisplayMode.FloatingWidget;
+
     public ObservableCollection<ShortcutCategory> FilteredCategories { get; }
 
     public IReadOnlyCollection<ShortcutProfile> AllProfiles => _profileManager.AllProfiles;
+
+    /// <summary>
+    /// The currently active overlay window. Set by App.xaml.cs when switching modes.
+    /// </summary>
+    public IOverlayMode? ActiveOverlay { get; set; }
 
     public MainViewModel(
         WindowDetectionService detection,
@@ -105,5 +121,11 @@ public partial class MainViewModel : ObservableObject
     {
         // TODO: Phase 3 — wire up settings dialog window
         System.Diagnostics.Debug.WriteLine("Settings dialog not yet implemented (Phase 3).");
+    }
+
+    [RelayCommand]
+    public void ToggleOverlay()
+    {
+        ActiveOverlay?.ToggleVisibility();
     }
 }

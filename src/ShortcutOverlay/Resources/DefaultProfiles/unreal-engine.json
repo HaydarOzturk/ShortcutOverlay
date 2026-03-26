@@ -1,0 +1,60 @@
+{
+  "profileId": "unreal-engine",
+  "displayName": "Unreal Engine 5",
+  "processNames": ["UnrealEditor", "UE4Editor"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Viewport Navigation",
+      "shortcuts": [
+        { "keys": "RightMouse+WASD", "description": "Fly camera", "tags": ["navigation", "camera", "viewport"] },
+        { "keys": "Alt+LeftMouseDrag", "description": "Orbit camera", "tags": ["navigation", "camera", "orbit"] },
+        { "keys": "Alt+RightMouseDrag", "description": "Zoom camera", "tags": ["navigation", "zoom", "camera"] },
+        { "keys": "F", "description": "Focus on selection", "tags": ["navigation", "focus"] },
+        { "keys": "G", "description": "Toggle game mode", "tags": ["navigation", "viewport"] },
+        { "keys": "V", "description": "Cycle viewport modes", "tags": ["navigation", "viewport"] }
+      ]
+    },
+    {
+      "name": "Blueprint Editor",
+      "shortcuts": [
+        { "keys": "Ctrl+B", "description": "Compile blueprint", "tags": ["blueprint", "compile"] },
+        { "keys": "Ctrl+Alt+B", "description": "Refresh blueprint", "tags": ["blueprint", "refresh"] },
+        { "keys": "F5", "description": "Debug blueprint", "tags": ["blueprint", "debug"] },
+        { "keys": "Ctrl+Shift+P", "description": "Show all functions", "tags": ["blueprint", "search"] },
+        { "keys": "Delete", "description": "Delete node", "tags": ["blueprint", "edit"] }
+      ]
+    },
+    {
+      "name": "Content Browser",
+      "shortcuts": [
+        { "keys": "Ctrl+P", "description": "Search content", "tags": ["search", "content", "browser"] },
+        { "keys": "Ctrl+Shift+G", "description": "Show in folder", "tags": ["content", "navigate"] },
+        { "keys": "Delete", "description": "Delete asset", "tags": ["asset", "delete"] },
+        { "keys": "Ctrl+D", "description": "Duplicate asset", "tags": ["asset", "duplicate"] }
+      ]
+    },
+    {
+      "name": "Build & Compile",
+      "shortcuts": [
+        { "keys": "Ctrl+S", "description": "Save current map", "tags": ["save", "file"] },
+        { "keys": "Ctrl+Shift+S", "description": "Save all", "tags": ["save", "file"] },
+        { "keys": "Alt+P", "description": "Play in editor", "tags": ["play", "game"] },
+        { "keys": "Escape", "description": "Stop play", "tags": ["stop", "play"] },
+        { "keys": "Ctrl+Shift+L", "description": "Build lighting", "tags": ["build", "lighting"] }
+      ]
+    },
+    {
+      "name": "General",
+      "shortcuts": [
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "edit"] },
+        { "keys": "Ctrl+Y", "description": "Redo", "tags": ["redo", "edit"] },
+        { "keys": "Delete", "description": "Delete actor", "tags": ["delete", "actor"] },
+        { "keys": "W", "description": "Move tool", "tags": ["tool", "move"] },
+        { "keys": "E", "description": "Rotate tool", "tags": ["tool", "rotate"] },
+        { "keys": "R", "description": "Scale tool", "tags": ["tool", "scale"] }
+      ]
+    }
+  ]
+}

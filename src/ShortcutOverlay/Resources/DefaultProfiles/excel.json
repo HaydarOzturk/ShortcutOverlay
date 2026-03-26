@@ -1,0 +1,78 @@
+{
+  "profileId": "excel",
+  "displayName": "Microsoft Excel",
+  "processNames": ["EXCEL"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Ctrl+Home", "description": "Go to cell A1", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+End", "description": "Go to last used cell", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+G", "description": "Go to cell", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+Right", "description": "Move right to data end", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+Left", "description": "Move left to data start", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+Up", "description": "Move up to data end", "tags": ["navigate", "cell"] },
+        { "keys": "Ctrl+Down", "description": "Move down to data end", "tags": ["navigate", "cell"] }
+      ]
+    },
+    {
+      "name": "Formatting",
+      "shortcuts": [
+        { "keys": "Ctrl+B", "description": "Bold", "tags": ["format", "bold"] },
+        { "keys": "Ctrl+I", "description": "Italic", "tags": ["format", "italic"] },
+        { "keys": "Ctrl+U", "description": "Underline", "tags": ["format", "underline"] },
+        { "keys": "Ctrl+1", "description": "Format cells", "tags": ["format", "cell"] },
+        { "keys": "Ctrl+Shift+5", "description": "Percent format", "tags": ["format", "number"] },
+        { "keys": "Ctrl+Shift+4", "description": "Currency format", "tags": ["format", "number"] },
+        { "keys": "Ctrl+Shift+3", "description": "Date format", "tags": ["format", "number"] }
+      ]
+    },
+    {
+      "name": "Data",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+L", "description": "AutoFilter", "tags": ["data", "filter"] },
+        { "keys": "Ctrl+Shift+T", "description": "Format as table", "tags": ["data", "table"] },
+        { "keys": "Ctrl+D", "description": "Fill down", "tags": ["data", "fill"] },
+        { "keys": "Ctrl+R", "description": "Fill right", "tags": ["data", "fill"] },
+        { "keys": "Ctrl+Shift+D", "description": "Fill series", "tags": ["data", "fill"] }
+      ]
+    },
+    {
+      "name": "Formulas",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+F3", "description": "Create names", "tags": ["formula", "name"] },
+        { "keys": "Ctrl+Shift+Equals", "description": "AutoSum", "tags": ["formula", "sum"] },
+        { "keys": "Ctrl+Backtick", "description": "Show formulas", "tags": ["formula", "view"] },
+        { "keys": "F9", "description": "Recalculate", "tags": ["formula", "calculate"] },
+        { "keys": "Ctrl+Shift+F9", "description": "Recalculate all", "tags": ["formula", "calculate"] }
+      ]
+    },
+    {
+      "name": "Selection",
+      "shortcuts": [
+        { "keys": "Ctrl+A", "description": "Select all", "tags": ["select", "cell"] },
+        { "keys": "Ctrl+Shift+End", "description": "Select to last used", "tags": ["select", "cell"] },
+        { "keys": "Ctrl+Shift+Home", "description": "Select to A1", "tags": ["select", "cell"] },
+        { "keys": "Shift+Space", "description": "Select row", "tags": ["select", "row"] },
+        { "keys": "Ctrl+Space", "description": "Select column", "tags": ["select", "column"] },
+        { "keys": "Ctrl+Alt+Shift+Right", "description": "Extend selection", "tags": ["select", "cell"] }
+      ]
+    },
+    {
+      "name": "File & Edit",
+      "shortcuts": [
+        { "keys": "Ctrl+N", "description": "New workbook", "tags": ["file", "new"] },
+        { "keys": "Ctrl+O", "description": "Open", "tags": ["file", "open"] },
+        { "keys": "Ctrl+S", "description": "Save", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Shift+S", "description": "Save as", "tags": ["file", "save"] },
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["edit", "undo"] },
+        { "keys": "Ctrl+Y", "description": "Redo", "tags": ["edit", "redo"] },
+        { "keys": "Ctrl+X", "description": "Cut", "tags": ["edit", "cut"] },
+        { "keys": "Ctrl+C", "description": "Copy", "tags": ["edit", "copy"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["edit", "paste"] }
+      ]
+    }
+  ]
+}

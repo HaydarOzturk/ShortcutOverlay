@@ -1,0 +1,44 @@
+{
+  "profileId": "file-explorer",
+  "displayName": "File Explorer",
+  "processNames": ["file-explorer"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Alt+Up", "description": "Go up one level", "tags": ["navigate", "folder"] },
+        { "keys": "Alt+Left", "description": "Back", "tags": ["navigate", "history"] },
+        { "keys": "Alt+Right", "description": "Forward", "tags": ["navigate", "history"] },
+        { "keys": "Home", "description": "Go to home", "tags": ["navigate", "home"] },
+        { "keys": "Ctrl+L", "description": "Address bar", "tags": ["navigate", "address"] },
+        { "keys": "F5", "description": "Refresh", "tags": ["navigate", "refresh"] }
+      ]
+    },
+    {
+      "name": "File Management",
+      "shortcuts": [
+        { "keys": "Ctrl+N", "description": "New folder", "tags": ["file", "new", "folder"] },
+        { "keys": "F2", "description": "Rename", "tags": ["file", "rename"] },
+        { "keys": "Delete", "description": "Delete file", "tags": ["file", "delete"] },
+        { "keys": "Shift+Delete", "description": "Permanent delete", "tags": ["file", "delete", "permanent"] },
+        { "keys": "Ctrl+X", "description": "Cut", "tags": ["file", "cut"] },
+        { "keys": "Ctrl+C", "description": "Copy", "tags": ["file", "copy"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["file", "paste"] },
+        { "keys": "Ctrl+A", "description": "Select all", "tags": ["file", "select"] },
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "file"] }
+      ]
+    },
+    {
+      "name": "View",
+      "shortcuts": [
+        { "keys": "Ctrl+Plus", "description": "Increase icon size", "tags": ["view", "size"] },
+        { "keys": "Ctrl+Minus", "description": "Decrease icon size", "tags": ["view", "size"] },
+        { "keys": "Ctrl+0", "description": "Reset icon size", "tags": ["view", "size"] },
+        { "keys": "Alt+V+G", "description": "Group by", "tags": ["view", "group"] },
+        { "keys": "Ctrl+Shift+L", "description": "Toggle details pane", "tags": ["view", "details"] }
+      ]
+    }
+  ]
+}

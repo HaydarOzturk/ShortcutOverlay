@@ -38,7 +38,7 @@ public sealed class ProfileManager
     }
 
     /// <summary>
-    /// Ensures default profiles exist in AppData. Copies from embedded resources on first run.
+    /// Ensures default profiles exist in AppData. Extracts from embedded resources on first run.
     /// </summary>
     private void EnsureDefaultProfiles()
     {
@@ -49,27 +49,31 @@ public sealed class ProfileManager
         if (existingProfiles.Length > 0)
             return;
 
-        // Copy default profiles from Resources/DefaultProfiles
-        var resourcePath = GetResourceProfilePath();
-        if (!Directory.Exists(resourcePath))
-            return;
+        // Extract embedded resource profiles
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var resourcePrefix = "ShortcutOverlay.Resources.DefaultProfiles.";
 
-        foreach (var file in Directory.GetFiles(resourcePath, "*.json"))
+        foreach (var resourceName in assembly.GetManifestResourceNames())
         {
-            var fileName = Path.GetFileName(file);
-            var destPath = Path.Combine(_profilesPath, fileName);
-            File.Copy(file, destPath, overwrite: false);
-        }
-    }
+            if (!resourceName.StartsWith(resourcePrefix) || !resourceName.EndsWith(".json"))
+                continue;
 
-    /// <summary>
-    /// Gets the path to the embedded default profiles in Resources.
-    /// </summary>
-    private static string GetResourceProfilePath()
-    {
-        var assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        var assemblyDir = Path.GetDirectoryName(assemblyLocation) ?? string.Empty;
-        return Path.Combine(assemblyDir, "Resources", "DefaultProfiles");
+            var fileName = resourceName.Substring(resourcePrefix.Length);
+            var destPath = Path.Combine(_profilesPath, fileName);
+
+            try
+            {
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null) continue;
+
+                using var fileStream = File.Create(destPath);
+                stream.CopyTo(fileStream);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to extract profile {fileName}: {ex.Message}");
+            }
+        }
     }
 
     /// <summary>

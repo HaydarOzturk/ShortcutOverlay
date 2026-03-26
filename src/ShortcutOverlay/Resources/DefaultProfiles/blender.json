@@ -1,0 +1,61 @@
+{
+  "profileId": "blender",
+  "displayName": "Blender 3D",
+  "processNames": ["blender"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Numpad0", "description": "Camera view", "tags": ["navigation", "view"] },
+        { "keys": "Numpad1", "description": "Front view", "tags": ["navigation", "view"] },
+        { "keys": "Numpad3", "description": "Side view", "tags": ["navigation", "view"] },
+        { "keys": "Numpad7", "description": "Top view", "tags": ["navigation", "view"] },
+        { "keys": "Numpad.Delete", "description": "Isolate object", "tags": ["navigation", "focus"] },
+        { "keys": "ScrollWheel", "description": "Zoom", "tags": ["navigation", "zoom"] }
+      ]
+    },
+    {
+      "name": "Modeling",
+      "shortcuts": [
+        { "keys": "Shift+A", "description": "Add object/mesh", "tags": ["add", "model", "mesh"] },
+        { "keys": "X", "description": "Delete", "tags": ["delete", "remove"] },
+        { "keys": "S", "description": "Scale", "tags": ["transform", "scale"] },
+        { "keys": "G", "description": "Grab/Move", "tags": ["transform", "move"] },
+        { "keys": "R", "description": "Rotate", "tags": ["transform", "rotate"] },
+        { "keys": "K", "description": "Knife tool", "tags": ["model", "cut", "edit"] }
+      ]
+    },
+    {
+      "name": "Edit Mode",
+      "shortcuts": [
+        { "keys": "Tab", "description": "Toggle Edit/Object mode", "tags": ["edit", "mode", "toggle"] },
+        { "keys": "E", "description": "Extrude", "tags": ["edit", "extrude", "model"] },
+        { "keys": "I", "description": "Inset faces", "tags": ["edit", "model"] },
+        { "keys": "F", "description": "Fill face", "tags": ["edit", "face"] },
+        { "keys": "Alt+E", "description": "Edge menu", "tags": ["edit", "menu"] },
+        { "keys": "Ctrl+E", "description": "Edge select menu", "tags": ["edit", "select"] }
+      ]
+    },
+    {
+      "name": "Sculpting",
+      "shortcuts": [
+        { "keys": "F", "description": "Brush size", "tags": ["sculpt", "brush", "size"] },
+        { "keys": "Shift+F", "description": "Brush strength", "tags": ["sculpt", "brush", "strength"] },
+        { "keys": "D", "description": "Sculpt brush toggle", "tags": ["sculpt", "brush"] },
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["undo", "edit"] }
+      ]
+    },
+    {
+      "name": "Animation",
+      "shortcuts": [
+        { "keys": "Shift+Spacebar", "description": "Play/Stop animation", "tags": ["animation", "play", "timeline"] },
+        { "keys": "I", "description": "Insert keyframe", "tags": ["animation", "keyframe"] },
+        { "keys": "Alt+I", "description": "Delete keyframe", "tags": ["animation", "keyframe", "delete"] },
+        { "keys": "Shift+Right", "description": "Next frame", "tags": ["animation", "timeline"] },
+        { "keys": "Shift+Left", "description": "Previous frame", "tags": ["animation", "timeline"] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "profileId": "powershell",
+  "displayName": "PowerShell",
+  "processNames": ["powershell", "pwsh"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Ctrl+D", "description": "Exit PowerShell", "tags": ["navigate", "exit"] },
+        { "keys": "Ctrl+L", "description": "Clear screen", "tags": ["navigate", "clear"] },
+        { "keys": "Home", "description": "Go to line start", "tags": ["navigate", "line"] },
+        { "keys": "End", "description": "Go to line end", "tags": ["navigate", "line"] },
+        { "keys": "Ctrl+Home", "description": "Go to buffer start", "tags": ["navigate", "buffer"] },
+        { "keys": "Ctrl+End", "description": "Go to buffer end", "tags": ["navigate", "buffer"] }
+      ]
+    },
+    {
+      "name": "History",
+      "shortcuts": [
+        { "keys": "Up", "description": "Previous command", "tags": ["history", "navigate"] },
+        { "keys": "Down", "description": "Next command", "tags": ["history", "navigate"] },
+        { "keys": "F7", "description": "Show command history", "tags": ["history", "list"] },
+        { "keys": "F8", "description": "Search history", "tags": ["history", "search"] },
+        { "keys": "F9", "description": "Execute history item", "tags": ["history", "execute"] }
+      ]
+    },
+    {
+      "name": "Editing",
+      "shortcuts": [
+        { "keys": "Ctrl+Z", "description": "Undo", "tags": ["edit", "undo"] },
+        { "keys": "Ctrl+X", "description": "Cut", "tags": ["edit", "cut"] },
+        { "keys": "Ctrl+C", "description": "Copy", "tags": ["edit", "copy"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["edit", "paste"] },
+        { "keys": "Ctrl+A", "description": "Select all", "tags": ["edit", "select"] },
+        { "keys": "Delete", "description": "Delete char", "tags": ["edit", "delete"] },
+        { "keys": "Backspace", "description": "Backspace", "tags": ["edit", "delete"] }
+      ]
+    },
+    {
+      "name": "Tab Completion",
+      "shortcuts": [
+        { "keys": "Tab", "description": "Complete command", "tags": ["completion", "auto"] },
+        { "keys": "Shift+Tab", "description": "Previous completion", "tags": ["completion", "auto"] },
+        { "keys": "Ctrl+Space", "description": "Menu complete", "tags": ["completion", "menu"] }
+      ]
+    }
+  ]
+}

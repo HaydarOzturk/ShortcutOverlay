@@ -1,0 +1,61 @@
+{
+  "profileId": "windows-terminal",
+  "displayName": "Windows Terminal",
+  "processNames": ["terminal", "WindowsTerminal"],
+  "windowClasses": [],
+  "icon": "",
+  "categories": [
+    {
+      "name": "Tabs",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+T", "description": "Open new tab", "tags": ["tab", "new"] },
+        { "keys": "Ctrl+Shift+N", "description": "Open new window", "tags": ["window", "new"] },
+        { "keys": "Ctrl+Shift+W", "description": "Close tab", "tags": ["tab", "close"] },
+        { "keys": "Ctrl+Tab", "description": "Next tab", "tags": ["tab", "navigate"] },
+        { "keys": "Ctrl+Shift+Tab", "description": "Previous tab", "tags": ["tab", "navigate"] },
+        { "keys": "Ctrl+Alt+1", "description": "Jump to tab 1", "tags": ["tab", "navigate"] },
+        { "keys": "Ctrl+Alt+2", "description": "Jump to tab 2", "tags": ["tab", "navigate"] },
+        { "keys": "Ctrl+Alt+9", "description": "Jump to last tab", "tags": ["tab", "navigate"] }
+      ]
+    },
+    {
+      "name": "Panes",
+      "shortcuts": [
+        { "keys": "Alt+Shift+Minus", "description": "Split horizontal", "tags": ["pane", "split"] },
+        { "keys": "Alt+Shift+Plus", "description": "Split vertical", "tags": ["pane", "split"] },
+        { "keys": "Alt+Shift+D", "description": "Close pane", "tags": ["pane", "close"] },
+        { "keys": "Alt+Up", "description": "Focus up pane", "tags": ["pane", "focus", "navigate"] },
+        { "keys": "Alt+Down", "description": "Focus down pane", "tags": ["pane", "focus", "navigate"] },
+        { "keys": "Alt+Left", "description": "Focus left pane", "tags": ["pane", "focus", "navigate"] },
+        { "keys": "Alt+Right", "description": "Focus right pane", "tags": ["pane", "focus", "navigate"] }
+      ]
+    },
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Ctrl+Shift+H", "description": "Open settings", "tags": ["navigate", "settings"] },
+        { "keys": "Ctrl+Shift+Comma", "description": "Open settings json", "tags": ["navigate", "settings"] },
+        { "keys": "Ctrl+F", "description": "Find", "tags": ["navigate", "search"] },
+        { "keys": "Ctrl+G", "description": "Go to line", "tags": ["navigate", "line"] }
+      ]
+    },
+    {
+      "name": "Copy/Paste",
+      "shortcuts": [
+        { "keys": "Ctrl+C", "description": "Copy selected", "tags": ["copy", "clipboard"] },
+        { "keys": "Ctrl+Shift+C", "description": "Copy command", "tags": ["copy", "clipboard"] },
+        { "keys": "Ctrl+V", "description": "Paste", "tags": ["paste", "clipboard"] },
+        { "keys": "Ctrl+Shift+V", "description": "Paste from clipboard", "tags": ["paste", "clipboard"] }
+      ]
+    },
+    {
+      "name": "General",
+      "shortcuts": [
+        { "keys": "Ctrl+Plus", "description": "Increase font size", "tags": ["zoom", "font"] },
+        { "keys": "Ctrl+Minus", "description": "Decrease font size", "tags": ["zoom", "font"] },
+        { "keys": "Ctrl+0", "description": "Reset font size", "tags": ["zoom", "font"] },
+        { "keys": "F11", "description": "Toggle fullscreen", "tags": ["fullscreen", "view"] }
+      ]
+    }
+  ]
+}
