@@ -1,17 +1,51 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <SolidColorBrush x:Key="OverlayBackground" Color="#C02D2D2D"/>
-    <SolidColorBrush x:Key="OverlayBorder" Color="#30FFFFFF"/>
-    <SolidColorBrush x:Key="HeaderBackground" Color="#15FFFFFF"/>
-    <SolidColorBrush x:Key="PrimaryText" Color="#FFE0E0E0"/>
-    <SolidColorBrush x:Key="SecondaryText" Color="#FF999999"/>
-    <SolidColorBrush x:Key="KeyBadgeBackground" Color="#FF3D3D3D"/>
-    <SolidColorBrush x:Key="KeyBadgeBorder" Color="#FF555555"/>
-    <SolidColorBrush x:Key="KeyBadgeText" Color="#FFE0E0E0"/>
-    <SolidColorBrush x:Key="SearchBackground" Color="#15FFFFFF"/>
-    <SolidColorBrush x:Key="SearchText" Color="#FFE0E0E0"/>
-    <SolidColorBrush x:Key="SearchPlaceholder" Color="#FF666666"/>
-    <SolidColorBrush x:Key="ShortcutRowBackground" Color="#10FFFFFF"/>
-    <SolidColorBrush x:Key="ShortcutRowHover" Color="#20FFFFFF"/>
-    <SolidColorBrush x:Key="CategoryDivider" Color="#15FFFFFF"/>
+
+    <!-- Apple Glass — Dark Mode -->
+    <!-- Frosted translucent surfaces with subtle depth -->
+
+    <!-- Main overlay surface: deep translucent glass -->
+    <SolidColorBrush x:Key="OverlayBackground" Color="#B01E1E1E"/>
+    <SolidColorBrush x:Key="OverlayBorder" Color="#18FFFFFF"/>
+
+    <!-- Header: slightly lighter glass layer -->
+    <SolidColorBrush x:Key="HeaderBackground" Color="#0AFFFFFF"/>
+
+    <!-- Text hierarchy -->
+    <SolidColorBrush x:Key="PrimaryText" Color="#F0FFFFFF"/>
+    <SolidColorBrush x:Key="SecondaryText" Color="#80FFFFFF"/>
+    <SolidColorBrush x:Key="TertiaryText" Color="#50FFFFFF"/>
+
+    <!-- Key badges: frosted pill style -->
+    <SolidColorBrush x:Key="KeyBadgeBackground" Color="#20FFFFFF"/>
+    <SolidColorBrush x:Key="KeyBadgeBorder" Color="#15FFFFFF"/>
+    <SolidColorBrush x:Key="KeyBadgeText" Color="#E0FFFFFF"/>
+
+    <!-- Search field: inset glass -->
+    <SolidColorBrush x:Key="SearchBackground" Color="#12FFFFFF"/>
+    <SolidColorBrush x:Key="SearchText" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="SearchPlaceholder" Color="#40FFFFFF"/>
+    <SolidColorBrush x:Key="SearchBorder" Color="#10FFFFFF"/>
+
+    <!-- Shortcut row containers: subtle glass cards -->
+    <SolidColorBrush x:Key="ShortcutRowBackground" Color="#08FFFFFF"/>
+    <SolidColorBrush x:Key="ShortcutRowHover" Color="#15FFFFFF"/>
+    <SolidColorBrush x:Key="ShortcutRowBorder" Color="#08FFFFFF"/>
+
+    <!-- Category dividers -->
+    <SolidColorBrush x:Key="CategoryDivider" Color="#10FFFFFF"/>
+
+    <!-- Footer buttons -->
+    <SolidColorBrush x:Key="FooterButtonBackground" Color="#10FFFFFF"/>
+    <SolidColorBrush x:Key="FooterButtonHover" Color="#20FFFFFF"/>
+    <SolidColorBrush x:Key="FooterButtonText" Color="#90FFFFFF"/>
+
+    <!-- Accent color (Apple blue) -->
+    <SolidColorBrush x:Key="AccentColor" Color="#FF0A84FF"/>
+    <SolidColorBrush x:Key="AccentColorSubtle" Color="#200A84FF"/>
+
+    <!-- Scrollbar -->
+    <SolidColorBrush x:Key="ScrollbarThumb" Color="#25FFFFFF"/>
+    <SolidColorBrush x:Key="ScrollbarTrack" Color="#00000000"/>
+
 </ResourceDictionary>

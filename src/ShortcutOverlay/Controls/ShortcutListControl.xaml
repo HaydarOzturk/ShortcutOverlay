@@ -4,54 +4,55 @@
              xmlns:local="clr-namespace:ShortcutOverlay.Controls">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <ItemsControl ItemsSource="{Binding Categories, RelativeSource={RelativeSource AncestorType=local:ShortcutListControl}}"
-                      Margin="8">
+                      Margin="10,4,10,10">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,0,0,12">
-                        <!-- Category Header with divider line -->
-                        <Border BorderBrush="{DynamicResource CategoryDivider}"
-                                BorderThickness="0,0,0,1"
-                                Padding="4,4,4,6"
-                                Margin="0,0,0,6">
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="11"
-                                       FontWeight="Bold"
-                                       Foreground="{DynamicResource SecondaryText}"
-                                       Opacity="0.8" />
+                    <StackPanel Margin="0,0,0,8">
+                        <!-- Category Header — Apple-style muted label -->
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource SecondaryText}"
+                                   Margin="4,8,4,6"
+                                   />
+
+                        <!-- Shortcuts — glass card group -->
+                        <Border Background="{DynamicResource ShortcutRowBackground}"
+                                BorderBrush="{DynamicResource ShortcutRowBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="0">
+                            <ItemsControl ItemsSource="{Binding Shortcuts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="10,8"
+                                                BorderBrush="{DynamicResource CategoryDivider}"
+                                                BorderThickness="0,0,0,1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" MinWidth="110"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Key badges (left) -->
+                                                <local:KeyComboDisplay Grid.Column="0"
+                                                                       Keys="{Binding Keys}"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="0,0,12,0"/>
+
+                                                <!-- Description (right) -->
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding Description}"
+                                                           FontSize="13"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource PrimaryText}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Border>
-
-                        <!-- Shortcuts in containers, side-by-side keys + description -->
-                        <ItemsControl ItemsSource="{Binding Shortcuts}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="{DynamicResource ShortcutRowBackground}"
-                                            CornerRadius="6"
-                                            Padding="8,6"
-                                            Margin="0,2">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" MinWidth="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <!-- Key badges (left side) -->
-                                            <local:KeyComboDisplay Grid.Column="0"
-                                                                   Keys="{Binding Keys}"
-                                                                   VerticalAlignment="Center"
-                                                                   Margin="0,0,10,0"/>
-
-                                            <!-- Description (right side) -->
-                                            <TextBlock Grid.Column="1"
-                                                       Text="{Binding Description}"
-                                                       FontSize="12"
-                                                       TextWrapping="Wrap"
-                                                       Foreground="{DynamicResource PrimaryText}"
-                                                       VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

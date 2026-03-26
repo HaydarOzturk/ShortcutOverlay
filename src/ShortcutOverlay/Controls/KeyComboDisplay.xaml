@@ -1,28 +1,28 @@
 <UserControl x:Class="ShortcutOverlay.Controls.KeyComboDisplay"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-        <ItemsControl ItemsSource="{Binding IndividualKeys, RelativeSource={RelativeSource AncestorType=UserControl}}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="4,0,4,0"
-                            Padding="8,4,8,4"
-                            CornerRadius="4"
-                            Background="{DynamicResource KeyBadgeBackground}"
-                            BorderBrush="{DynamicResource KeyBadgeBorder}"
-                            BorderThickness="1">
-                        <TextBlock Text="{Binding}"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource KeyBadgeText}"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </WrapPanel>
+    <ItemsControl ItemsSource="{Binding IndividualKeys, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <!-- Apple-style frosted pill badge -->
+                <Border Margin="0,0,3,0"
+                        Padding="7,3"
+                        CornerRadius="6"
+                        Background="{DynamicResource KeyBadgeBackground}"
+                        BorderBrush="{DynamicResource KeyBadgeBorder}"
+                        BorderThickness="0.5">
+                    <TextBlock Text="{Binding}"
+                               FontSize="11"
+                               FontWeight="Medium"
+                               FontFamily="SF Pro Text, Segoe UI, sans-serif"
+                               Foreground="{DynamicResource KeyBadgeText}"/>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>

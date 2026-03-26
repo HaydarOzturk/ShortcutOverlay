@@ -6,17 +6,16 @@
         AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
-        Width="300"
-        Height="500"
+        Width="320"
         ResizeMode="NoResize"
         MouseEnter="Window_MouseEnter"
         MouseLeave="Window_MouseLeave">
 
     <Border Background="{DynamicResource OverlayBackground}"
             BorderBrush="{DynamicResource OverlayBorder}"
-            BorderThickness="0,0,1,0">
+            BorderThickness="0,0,0.5,0">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="10" ShadowDepth="3" Opacity="0.4" />
+            <DropShadowEffect BlurRadius="20" ShadowDepth="2" Opacity="0.3" Direction="0" />
         </Border.Effect>
 
         <Grid>
@@ -28,28 +27,34 @@
 
             <!-- Header -->
             <Border Grid.Row="0"
-                    Background="{DynamicResource HeaderBackground}"
-                    Padding="12,10">
+                    Padding="14,14"
+                    BorderBrush="{DynamicResource CategoryDivider}"
+                    BorderThickness="0,0,0,0.5">
                 <TextBlock Text="{Binding CurrentAppName}"
                            Foreground="{DynamicResource PrimaryText}"
-                           FontWeight="Bold"
-                           FontSize="14" />
+                           FontWeight="SemiBold"
+                           FontSize="15"
+                           FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif" />
             </Border>
 
             <!-- Search -->
-            <Border Grid.Row="1" Padding="10,6">
-                <TextBox Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Padding="8,6"
-                         FontSize="12"
-                         Foreground="{DynamicResource PrimaryText}"
-                         Background="{DynamicResource SearchBackground}"
-                         BorderBrush="{DynamicResource OverlayBorder}"
-                         BorderThickness="1"
-                         Tag="Search shortcuts..."
-                         ToolTip="Type to filter shortcuts" />
+            <Border Grid.Row="1" Padding="12,8">
+                <Border Background="{DynamicResource SearchBackground}"
+                        BorderBrush="{DynamicResource SearchBorder}"
+                        BorderThickness="0.5"
+                        CornerRadius="8">
+                    <TextBox Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="10,7"
+                             FontSize="13"
+                             FontFamily="SF Pro Text, Segoe UI, sans-serif"
+                             Foreground="{DynamicResource SearchText}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Tag="Search shortcuts..." />
+                </Border>
             </Border>
 
-            <!-- Shared Shortcut List -->
+            <!-- Shortcut List -->
             <controls:ShortcutListControl Grid.Row="2"
                                           Categories="{Binding FilteredCategories}" />
         </Grid>
