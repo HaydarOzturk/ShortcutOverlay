@@ -36,10 +36,10 @@ public partial class App : Application
 
         Services = services.BuildServiceProvider();
 
-        // Load and apply the user's theme from settings
+        // Load settings and initialize the theme system with animated brushes
         var settingsService = Services.GetRequiredService<SettingsService>();
-        settingsService.LoadAsync().GetAwaiter().GetResult();
-        ThemeManager.ApplyTheme(settingsService.Current.Theme);
+        settingsService.Load();
+        ThemeManager.Initialize(settingsService.Current.Theme);
 
         // Start window detection
         var detection = Services.GetRequiredService<WindowDetectionService>();

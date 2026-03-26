@@ -5,7 +5,7 @@
     <!-- Warm amber-orange glass, comfortable on warm-lit or Night Light screens -->
 
     <!-- Main overlay surface: warm amber translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B02A1E0E"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#802A1E0E"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#18E0A050"/>
 
     <!-- Header: subtle amber-tinted layer -->

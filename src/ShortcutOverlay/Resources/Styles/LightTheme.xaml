@@ -5,7 +5,7 @@
     <!-- Frosted white glass with subtle depth -->
 
     <!-- Main overlay surface: bright frosted glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B0F5F5F7"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#80F5F5F7"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#20000000"/>
 
     <!-- Header: slightly tinted layer -->

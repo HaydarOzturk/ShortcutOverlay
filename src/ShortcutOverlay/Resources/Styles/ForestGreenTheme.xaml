@@ -5,7 +5,7 @@
     <!-- Natural earth-green glass, easy on eyes for extended use -->
 
     <!-- Main overlay surface: deep forest translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B0121A0A"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#80121A0A"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#1868A060"/>
 
     <!-- Header: subtle green-tinted layer -->

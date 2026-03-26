@@ -48,7 +48,8 @@
                                FontWeight="SemiBold"
                                FontSize="15"
                                FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
-                               VerticalAlignment="Center" />
+                               VerticalAlignment="Center"
+                               Effect="{StaticResource TextShadowLight}" />
 
                     <!-- Hamburger menu icon -->
                     <TextBlock Grid.Column="1"

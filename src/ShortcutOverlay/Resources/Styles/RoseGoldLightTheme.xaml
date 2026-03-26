@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Apple Glass — Rose Gold Light -->
+    <!-- Soft frosted pink-white glass for bright backgrounds -->
+
+    <!-- Main overlay surface: frosted blush-white glass -->
+    <SolidColorBrush x:Key="OverlayBackground" Color="#90F8E4EA"/>
+    <SolidColorBrush x:Key="OverlayBorder" Color="#20C06878"/>
+
+    <!-- Header: subtle rose-tinted layer -->
+    <SolidColorBrush x:Key="HeaderBackground" Color="#0AA04858"/>
+
+    <!-- Text hierarchy -->
+    <SolidColorBrush x:Key="PrimaryText" Color="#F03A1820"/>
+    <SolidColorBrush x:Key="SecondaryText" Color="#70602838"/>
+    <SolidColorBrush x:Key="TertiaryText" Color="#40804050"/>
+
+    <!-- Key badges: frosted rose pill style -->
+    <SolidColorBrush x:Key="KeyBadgeBackground" Color="#18A04858"/>
+    <SolidColorBrush x:Key="KeyBadgeBorder" Color="#12C06878"/>
+    <SolidColorBrush x:Key="KeyBadgeText" Color="#D03A1820"/>
+
+    <!-- Search field: inset glass -->
+    <SolidColorBrush x:Key="SearchBackground" Color="#0CA04858"/>
+    <SolidColorBrush x:Key="SearchText" Color="#D03A1820"/>
+    <SolidColorBrush x:Key="SearchPlaceholder" Color="#40885060"/>
+    <SolidColorBrush x:Key="SearchBorder" Color="#0AC06878"/>
+
+    <!-- Shortcut row containers -->
+    <SolidColorBrush x:Key="ShortcutRowBackground" Color="#06803848"/>
+    <SolidColorBrush x:Key="ShortcutRowHover" Color="#10A04858"/>
+    <SolidColorBrush x:Key="ShortcutRowBorder" Color="#06904050"/>
+
+    <!-- Category dividers -->
+    <SolidColorBrush x:Key="CategoryDivider" Color="#10905060"/>
+
+    <!-- Footer buttons -->
+    <SolidColorBrush x:Key="FooterButtonBackground" Color="#08A04858"/>
+    <SolidColorBrush x:Key="FooterButtonHover" Color="#15C06878"/>
+    <SolidColorBrush x:Key="FooterButtonText" Color="#80602838"/>
+
+    <!-- Accent color (rose pink) -->
+    <SolidColorBrush x:Key="AccentColor" Color="#FFEC4899"/>
+    <SolidColorBrush x:Key="AccentColorSubtle" Color="#20EC4899"/>
+
+    <!-- Scrollbar -->
+    <SolidColorBrush x:Key="ScrollbarThumb" Color="#20C06878"/>
+    <SolidColorBrush x:Key="ScrollbarTrack" Color="#00000000"/>
+
+</ResourceDictionary>

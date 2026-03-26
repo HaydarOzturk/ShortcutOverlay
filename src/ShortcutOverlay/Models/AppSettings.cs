@@ -5,7 +5,7 @@ public record AppSettings
     public string DisplayMode { get; init; } = "floating";
     public string GlobalHotkey { get; init; } = "Ctrl+Shift+S";
     public double Opacity { get; init; } = 0.85;
-    public string Theme { get; init; } = "MidnightBlueTheme";
+    public string Theme { get; init; } = "auto";
     public string DockSide { get; init; } = "right";
     public bool StartWithWindows { get; init; } = false;
     public bool AutoSwitchProfiles { get; init; } = true;

@@ -5,7 +5,7 @@
     <!-- Warm pinkish-gold glass, elegant on warm-toned or calibrated screens -->
 
     <!-- Main overlay surface: warm blush translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B02A1A1A"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#802A1A1A"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#18FF9EAA"/>
 
     <!-- Header: subtle rose-tinted layer -->

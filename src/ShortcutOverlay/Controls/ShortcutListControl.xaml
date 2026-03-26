@@ -14,7 +14,7 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource SecondaryText}"
                                    Margin="4,8,4,6"
-                                   />
+                                   Effect="{StaticResource TextShadowLight}" />
 
                         <!-- Shortcuts — glass card group -->
                         <Border Background="{DynamicResource ShortcutRowBackground}"

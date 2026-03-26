@@ -5,7 +5,7 @@
     <!-- Frosted translucent surfaces with subtle depth -->
 
     <!-- Main overlay surface: deep translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B01E1E1E"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#801E1E1E"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#18FFFFFF"/>
 
     <!-- Header: slightly lighter glass layer -->

@@ -57,6 +57,35 @@ public sealed class SettingsService
     }
 
     /// <summary>
+    /// Loads settings synchronously from disk. Safe to call on UI thread at startup.
+    /// Creates default settings if file doesn't exist.
+    /// </summary>
+    public void Load()
+    {
+        try
+        {
+            if (File.Exists(_settingsPath))
+            {
+                var json = File.ReadAllText(_settingsPath);
+                var loaded = JsonSerializer.Deserialize<AppSettings>(json, _jsonOptions);
+                if (loaded != null)
+                {
+                    _currentSettings = loaded;
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load settings: {ex.Message}");
+        }
+
+        // Create default settings
+        _currentSettings = new AppSettings();
+        Save();
+    }
+
+    /// <summary>
     /// Loads settings from disk. Creates default settings if file doesn't exist.
     /// </summary>
     public async Task LoadAsync()
@@ -82,6 +111,26 @@ public sealed class SettingsService
         // Create default settings
         _currentSettings = new AppSettings();
         await SaveAsync();
+    }
+
+    /// <summary>
+    /// Saves the current settings to disk synchronously.
+    /// </summary>
+    public void Save()
+    {
+        try
+        {
+            var directory = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
+            var json = JsonSerializer.Serialize(_currentSettings, _jsonOptions);
+            File.WriteAllText(_settingsPath, json);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save settings: {ex.Message}");
+        }
     }
 
     /// <summary>

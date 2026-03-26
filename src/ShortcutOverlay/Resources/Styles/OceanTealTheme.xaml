@@ -5,7 +5,7 @@
     <!-- Cool aqua-green glass, great on blue-light filtered or neutral screens -->
 
     <!-- Main overlay surface: deep teal translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B00A2020"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#800A2020"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#1850C8B8"/>
 
     <!-- Header: subtle teal-tinted layer -->

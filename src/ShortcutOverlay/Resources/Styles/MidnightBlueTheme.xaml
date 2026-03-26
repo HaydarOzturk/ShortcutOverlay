@@ -5,7 +5,7 @@
     <!-- Deep navy glass, ideal for dark/AMOLED screens and late-night use -->
 
     <!-- Main overlay surface: deep navy translucent glass -->
-    <SolidColorBrush x:Key="OverlayBackground" Color="#B00A1628"/>
+    <SolidColorBrush x:Key="OverlayBackground" Color="#800A1628"/>
     <SolidColorBrush x:Key="OverlayBorder" Color="#18608BFF"/>
 
     <!-- Header: subtle blue-tinted layer -->
