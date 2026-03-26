@@ -30,6 +30,12 @@ public static class ThemeManager
     private static readonly ConcurrentDictionary<string, int> _cacheConfidence = new();
     private const int ConfidenceThreshold = 2; // Need 2 consecutive readings to flip cache
 
+    // After a cache-hit instant switch, skip verification for this many ms.
+    // This prevents the strips from sampling the PREVIOUS window's pixels
+    // while Windows is still animating the switch.
+    private const int CacheVerifyDelayMs = 600;
+    private static DateTime _lastCacheHit = DateTime.MinValue;
+
     public static bool IsAdaptiveMode => _isAdaptiveMode;
     public static string CurrentFamily => _currentFamily;
 
@@ -91,23 +97,34 @@ public static class ThemeManager
                 AdaptiveDebugLog.Log($"AdaptToBackground: CACHED '{processName}' isDark={cachedIsDark} — INSTANT switch");
                 _currentVariantIsDark = cachedIsDark;
                 ThemeAnimator.SetImmediate(GetPalette(_currentFamily, cachedIsDark));
+                _lastCacheHit = DateTime.UtcNow;
+                return; // Trust the cache — don't verify immediately during switch
             }
 
-            // Verify cache in background — but require multiple consecutive readings to flip
+            // DEFERRED VERIFICATION: Only verify cache if enough time has passed
+            // since the last cache hit. This prevents sampling the PREVIOUS window's
+            // pixels while Windows is still animating the switch.
+            var msSinceCacheHit = (DateTime.UtcNow - _lastCacheHit).TotalMilliseconds;
+            if (msSinceCacheHit < CacheVerifyDelayMs)
+            {
+                AdaptiveDebugLog.Log($"AdaptToBackground: CACHED '{processName}' — skipping verify ({msSinceCacheHit:F0}ms < {CacheVerifyDelayMs}ms)");
+                return;
+            }
+
+            // Enough time has passed — verify the cache with a fresh reading
             var isLight = ScreenBrightnessDetector.IsBackgroundLight(
                 foregroundHwnd, overlayX, overlayY, overlayWidth, overlayHeight);
             var freshIsDark = !isLight;
 
             if (freshIsDark != cachedIsDark)
             {
-                // Increment counter for this disagreement
+                // Increment confidence counter — need multiple readings to flip
                 var key = processName + (freshIsDark ? "_dark" : "_light");
                 _cacheConfidence.AddOrUpdate(key, 1, (_, count) => count + 1);
 
                 if (_cacheConfidence.TryGetValue(key, out int count) && count >= ConfidenceThreshold)
                 {
-                    // Confirmed stale — update cache
-                    AdaptiveDebugLog.Log($"AdaptToBackground: Cache CONFIRMED STALE for '{processName}': was={cachedIsDark}, now={freshIsDark} (count={count})");
+                    AdaptiveDebugLog.Log($"AdaptToBackground: Cache STALE for '{processName}': was={cachedIsDark}, now={freshIsDark} (count={count})");
                     _appBrightnessCache[processName] = freshIsDark;
                     _cacheConfidence.TryRemove(key, out _);
 
@@ -117,19 +134,14 @@ public static class ThemeManager
                         ThemeAnimator.TransitionFast(GetPalette(_currentFamily, freshIsDark));
                     }
                 }
-                else
-                {
-                    AdaptiveDebugLog.Log($"AdaptToBackground: Cache disagrees for '{processName}' (count={count}/{ConfidenceThreshold}), waiting for confirmation");
-                }
             }
             else
             {
-                // Readings agree with cache — reset any disagreement counters
+                // Readings agree — reset disagreement counters
                 _cacheConfidence.TryRemove(processName + "_dark", out _);
                 _cacheConfidence.TryRemove(processName + "_light", out _);
             }
 
-            // Adjust readability based on current background variance
             ThemeAnimator.AdjustForReadability(ScreenBrightnessDetector.LastBrightnessVariance);
             return;
         }
