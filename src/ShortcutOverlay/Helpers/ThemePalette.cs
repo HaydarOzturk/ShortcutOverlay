@@ -42,7 +42,7 @@ public class ThemePalette
     public static ThemePalette ClassicDark => new()
     {
         Name = "ClassicDark",
-        OverlayBackground = C("#801E1E1E"), OverlayBorder = C("#18FFFFFF"),
+        OverlayBackground = C("#C01E1E1E"), OverlayBorder = C("#18FFFFFF"),
         HeaderBackground = C("#0AFFFFFF"),
         PrimaryText = C("#F0FFFFFF"), SecondaryText = C("#80FFFFFF"), TertiaryText = C("#50FFFFFF"),
         KeyBadgeBackground = C("#20FFFFFF"), KeyBadgeBorder = C("#15FFFFFF"), KeyBadgeText = C("#E0FFFFFF"),
@@ -57,7 +57,7 @@ public class ThemePalette
     public static ThemePalette ClassicLight => new()
     {
         Name = "ClassicLight",
-        OverlayBackground = C("#80F5F5F7"), OverlayBorder = C("#20000000"),
+        OverlayBackground = C("#C8F5F5F7"), OverlayBorder = C("#20000000"),
         HeaderBackground = C("#08000000"),
         PrimaryText = C("#F0000000"), SecondaryText = C("#70000000"), TertiaryText = C("#40000000"),
         KeyBadgeBackground = C("#18000000"), KeyBadgeBorder = C("#10000000"), KeyBadgeText = C("#D0000000"),
@@ -73,7 +73,7 @@ public class ThemePalette
     public static ThemePalette MidnightBlueDark => new()
     {
         Name = "MidnightBlueDark",
-        OverlayBackground = C("#800A1628"), OverlayBorder = C("#18608BFF"),
+        OverlayBackground = C("#C00A1628"), OverlayBorder = C("#18608BFF"),
         HeaderBackground = C("#0A4080D0"),
         PrimaryText = C("#F0D8E4FF"), SecondaryText = C("#80A0BBEE"), TertiaryText = C("#506888BB"),
         KeyBadgeBackground = C("#203060A0"), KeyBadgeBorder = C("#18406EBB"), KeyBadgeText = C("#E0C8DAFF"),
@@ -88,7 +88,7 @@ public class ThemePalette
     public static ThemePalette MidnightBlueLight => new()
     {
         Name = "MidnightBlueLight",
-        OverlayBackground = C("#90DEEAF8"), OverlayBorder = C("#20406EBB"),
+        OverlayBackground = C("#C8DEEAF8"), OverlayBorder = C("#20406EBB"),
         HeaderBackground = C("#0A2050A0"),
         PrimaryText = C("#F00A1830"), SecondaryText = C("#70183060"), TertiaryText = C("#40284878"),
         KeyBadgeBackground = C("#183060A0"), KeyBadgeBorder = C("#12406EBB"), KeyBadgeText = C("#D00A1830"),
@@ -104,7 +104,7 @@ public class ThemePalette
     public static ThemePalette RoseGoldDark => new()
     {
         Name = "RoseGoldDark",
-        OverlayBackground = C("#802A1A1A"), OverlayBorder = C("#18FF9EAA"),
+        OverlayBackground = C("#C02A1A1A"), OverlayBorder = C("#18FF9EAA"),
         HeaderBackground = C("#0AE08890"),
         PrimaryText = C("#F0FFE4E8"), SecondaryText = C("#80E0A8B0"), TertiaryText = C("#50B07880"),
         KeyBadgeBackground = C("#20A05060"), KeyBadgeBorder = C("#18C06878"), KeyBadgeText = C("#E0FFD8E0"),
@@ -119,7 +119,7 @@ public class ThemePalette
     public static ThemePalette RoseGoldLight => new()
     {
         Name = "RoseGoldLight",
-        OverlayBackground = C("#90F8E4EA"), OverlayBorder = C("#20C06878"),
+        OverlayBackground = C("#C8F8E4EA"), OverlayBorder = C("#20C06878"),
         HeaderBackground = C("#0AA04858"),
         PrimaryText = C("#F03A1820"), SecondaryText = C("#70602838"), TertiaryText = C("#40804050"),
         KeyBadgeBackground = C("#18A04858"), KeyBadgeBorder = C("#12C06878"), KeyBadgeText = C("#D03A1820"),
@@ -135,7 +135,7 @@ public class ThemePalette
     public static ThemePalette OceanTealDark => new()
     {
         Name = "OceanTealDark",
-        OverlayBackground = C("#800A2020"), OverlayBorder = C("#1850C8B8"),
+        OverlayBackground = C("#C00A2020"), OverlayBorder = C("#1850C8B8"),
         HeaderBackground = C("#0A30B0A0"),
         PrimaryText = C("#F0D8FFF8"), SecondaryText = C("#8090D8C8"), TertiaryText = C("#5060A098"),
         KeyBadgeBackground = C("#20208870"), KeyBadgeBorder = C("#1830A890"), KeyBadgeText = C("#E0D0FFF0"),
@@ -150,7 +150,7 @@ public class ThemePalette
     public static ThemePalette OceanTealLight => new()
     {
         Name = "OceanTealLight",
-        OverlayBackground = C("#90E0F5F0"), OverlayBorder = C("#2030A890"),
+        OverlayBackground = C("#C8E0F5F0"), OverlayBorder = C("#2030A890"),
         HeaderBackground = C("#0A208870"),
         PrimaryText = C("#F00A2820"), SecondaryText = C("#70184838"), TertiaryText = C("#40286858"),
         KeyBadgeBackground = C("#18208870"), KeyBadgeBorder = C("#1230A890"), KeyBadgeText = C("#D00A2820"),
@@ -166,7 +166,7 @@ public class ThemePalette
     public static ThemePalette ForestGreenDark => new()
     {
         Name = "ForestGreenDark",
-        OverlayBackground = C("#80121A0A"), OverlayBorder = C("#1868A060"),
+        OverlayBackground = C("#C0121A0A"), OverlayBorder = C("#1868A060"),
         HeaderBackground = C("#0A50A048"),
         PrimaryText = C("#F0E8FFE8"), SecondaryText = C("#80A0D098"), TertiaryText = C("#5070A068"),
         KeyBadgeBackground = C("#20408838"), KeyBadgeBorder = C("#1858A850"), KeyBadgeText = C("#E0E0FFD8"),
@@ -181,7 +181,7 @@ public class ThemePalette
     public static ThemePalette ForestGreenLight => new()
     {
         Name = "ForestGreenLight",
-        OverlayBackground = C("#90E8F5E8"), OverlayBorder = C("#2058A850"),
+        OverlayBackground = C("#C8E8F5E8"), OverlayBorder = C("#2058A850"),
         HeaderBackground = C("#0A408838"),
         PrimaryText = C("#F01A2A10"), SecondaryText = C("#70284820"), TertiaryText = C("#40406838"),
         KeyBadgeBackground = C("#18408838"), KeyBadgeBorder = C("#1258A850"), KeyBadgeText = C("#D01A2A10"),
@@ -197,7 +197,7 @@ public class ThemePalette
     public static ThemePalette SunsetAmberDark => new()
     {
         Name = "SunsetAmberDark",
-        OverlayBackground = C("#802A1E0E"), OverlayBorder = C("#18E0A050"),
+        OverlayBackground = C("#C02A1E0E"), OverlayBorder = C("#18E0A050"),
         HeaderBackground = C("#0AD09040"),
         PrimaryText = C("#F0FFF0D8"), SecondaryText = C("#80D8B880"), TertiaryText = C("#50A88850"),
         KeyBadgeBackground = C("#20A07828"), KeyBadgeBorder = C("#18C09038"), KeyBadgeText = C("#E0FFF0D0"),
@@ -212,7 +212,7 @@ public class ThemePalette
     public static ThemePalette SunsetAmberLight => new()
     {
         Name = "SunsetAmberLight",
-        OverlayBackground = C("#90F8F0E0"), OverlayBorder = C("#20C09038"),
+        OverlayBackground = C("#C8F8F0E0"), OverlayBorder = C("#20C09038"),
         HeaderBackground = C("#0AA07828"),
         PrimaryText = C("#F02A1E0A"), SecondaryText = C("#70503818"), TertiaryText = C("#40785828"),
         KeyBadgeBackground = C("#18A07828"), KeyBadgeBorder = C("#12C09038"), KeyBadgeText = C("#D02A1E0A"),

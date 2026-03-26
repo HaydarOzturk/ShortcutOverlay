@@ -14,15 +14,21 @@ namespace ShortcutOverlay.Helpers;
 /// the frozen brush with a new one each frame. DynamicResource bindings in XAML
 /// automatically pick up the replacement, so this works seamlessly.
 ///
-/// The visual result is identical to ColorAnimation: smooth 200ms transitions.
+/// Anti-flicker: readability alpha boost is baked into the transition target
+/// rather than applied as a post-hoc adjustment that fights with the timer.
+/// A cooldown prevents rapid-fire transitions from causing visible flicker.
 /// </summary>
 public static class ThemeAnimator
 {
     // Transition config
     private const int NormalTransitionMs = 200;
-    private const int FastTransitionMs = 80;   // For adaptive mode — snappier
-    private const int FrameIntervalMs = 16;    // ~60fps
+    private const int FastTransitionMs = 100;   // For adaptive mode — snappy but smooth
+    private const int FrameIntervalMs = 16;     // ~60fps
     private static int _totalFrames = NormalTransitionMs / FrameIntervalMs;
+
+    // Anti-flicker: minimum time between transitions (ms)
+    private const int TransitionCooldownMs = 300;
+    private static DateTime _lastTransitionStart = DateTime.MinValue;
 
     // All resource keys we manage
     private static readonly string[] BrushKeys =
@@ -40,12 +46,20 @@ public static class ThemeAnimator
 
     private static ThemePalette? _currentPalette;
     private static bool _initialized;
+    private static bool _isTransitioning;
+
+    // Readability: current alpha boost applied to OverlayBackground
+    private static byte _currentAlphaBoost;
+    private static byte _targetAlphaBoost;
 
     // Transition state
     private static DispatcherTimer? _transitionTimer;
     private static ThemePalette? _fromPalette;
     private static ThemePalette? _toPalette;
     private static int _currentFrame;
+
+    /// <summary>Whether a transition is currently in progress.</summary>
+    public static bool IsTransitioning => _isTransitioning;
 
     /// <summary>
     /// Creates initial brush resources in Application.Resources.
@@ -89,7 +103,7 @@ public static class ThemeAnimator
     }
 
     /// <summary>
-    /// Fast transition (~80ms) for adaptive mode — snappy but not jarring.
+    /// Fast transition (~100ms) for adaptive mode — snappy but not jarring.
     /// </summary>
     public static void TransitionFast(ThemePalette target)
     {
@@ -101,17 +115,75 @@ public static class ThemeAnimator
         if (!_initialized) return;
         if (_currentPalette?.Name == target.Name) return;
 
-        _transitionTimer?.Stop();
+        // Anti-flicker cooldown: reject transitions that come too fast
+        var now = DateTime.UtcNow;
+        var elapsed = (now - _lastTransitionStart).TotalMilliseconds;
+        if (elapsed < TransitionCooldownMs && _isTransitioning)
+        {
+            AdaptiveDebugLog.Log($"ThemeAnimator: COOLDOWN — skipping transition ({elapsed:F0}ms since last)");
+            return;
+        }
 
-        _fromPalette = _currentPalette;
+        _transitionTimer?.Stop();
+        _isTransitioning = true;
+        _lastTransitionStart = now;
+
+        // Snapshot current on-screen colors as the "from" state
+        // This handles mid-transition interrupts smoothly
+        _fromPalette = _isTransitioning ? SnapshotCurrentColors() : _currentPalette;
         _toPalette = target;
         _currentFrame = 0;
         _totalFrames = Math.Max(1, durationMs / FrameIntervalMs);
         _currentPalette = target;
 
-        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: {_fromPalette?.Name} → {target.Name} ({durationMs}ms, {_totalFrames} frames)");
+        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: → {target.Name} ({durationMs}ms, {_totalFrames} frames)");
 
         _transitionTimer?.Start();
+    }
+
+    /// <summary>
+    /// Captures the current on-screen colors as a snapshot palette.
+    /// Used when a new transition starts mid-way through a previous one,
+    /// so we interpolate from where we actually ARE, not where we were headed.
+    /// </summary>
+    private static ThemePalette SnapshotCurrentColors()
+    {
+        var res = Application.Current.Resources;
+        Color Snap(string key)
+        {
+            if (res[key] is SolidColorBrush brush)
+                return brush.Color;
+            return _currentPalette != null ? GetColor(_currentPalette, key) : Colors.Transparent;
+        }
+
+        return new ThemePalette
+        {
+            Name = "_snapshot_",
+            OverlayBackground = Snap("OverlayBackground"),
+            OverlayBorder = Snap("OverlayBorder"),
+            HeaderBackground = Snap("HeaderBackground"),
+            PrimaryText = Snap("PrimaryText"),
+            SecondaryText = Snap("SecondaryText"),
+            TertiaryText = Snap("TertiaryText"),
+            KeyBadgeBackground = Snap("KeyBadgeBackground"),
+            KeyBadgeBorder = Snap("KeyBadgeBorder"),
+            KeyBadgeText = Snap("KeyBadgeText"),
+            SearchBackground = Snap("SearchBackground"),
+            SearchText = Snap("SearchText"),
+            SearchPlaceholder = Snap("SearchPlaceholder"),
+            SearchBorder = Snap("SearchBorder"),
+            ShortcutRowBackground = Snap("ShortcutRowBackground"),
+            ShortcutRowHover = Snap("ShortcutRowHover"),
+            ShortcutRowBorder = Snap("ShortcutRowBorder"),
+            CategoryDivider = Snap("CategoryDivider"),
+            FooterButtonBackground = Snap("FooterButtonBackground"),
+            FooterButtonHover = Snap("FooterButtonHover"),
+            FooterButtonText = Snap("FooterButtonText"),
+            AccentColor = Snap("AccentColor"),
+            AccentColorSubtle = Snap("AccentColorSubtle"),
+            ScrollbarThumb = Snap("ScrollbarThumb"),
+            ScrollbarTrack = Snap("ScrollbarTrack"),
+        };
     }
 
     /// <summary>
@@ -123,6 +195,7 @@ public static class ThemeAnimator
         if (_fromPalette == null || _toPalette == null || _transitionTimer == null)
         {
             _transitionTimer?.Stop();
+            _isTransitioning = false;
             return;
         }
 
@@ -138,6 +211,14 @@ public static class ThemeAnimator
             var fromColor = GetColor(_fromPalette, key);
             var toColor = GetColor(_toPalette, key);
             var current = LerpColor(fromColor, toColor, eased);
+
+            // Bake readability boost into OverlayBackground during transition
+            if (key == "OverlayBackground" && _targetAlphaBoost > 0)
+            {
+                byte boostedAlpha = (byte)Math.Min(255, current.A + _targetAlphaBoost * eased);
+                current = Color.FromArgb(boostedAlpha, current.R, current.G, current.B);
+            }
+
             res[key] = new SolidColorBrush(current);
         }
 
@@ -145,7 +226,9 @@ public static class ThemeAnimator
         if (t >= 1.0)
         {
             _transitionTimer.Stop();
+            _isTransitioning = false;
             _fromPalette = null;
+            _currentAlphaBoost = _targetAlphaBoost;
             AdaptiveDebugLog.Log($"ThemeAnimator: Transition complete ({_currentFrame} frames)");
         }
     }
@@ -157,41 +240,65 @@ public static class ThemeAnimator
     {
         if (!_initialized) return;
         _transitionTimer?.Stop();
+        _isTransitioning = false;
 
         var res = Application.Current.Resources;
         foreach (var key in BrushKeys)
         {
-            res[key] = new SolidColorBrush(GetColor(target, key));
+            var color = GetColor(target, key);
+
+            // Apply current readability boost to OverlayBackground
+            if (key == "OverlayBackground" && _currentAlphaBoost > 0)
+            {
+                color = Color.FromArgb(
+                    (byte)Math.Min(255, color.A + _currentAlphaBoost),
+                    color.R, color.G, color.B);
+            }
+
+            res[key] = new SolidColorBrush(color);
         }
 
         _currentPalette = target;
+        _lastTransitionStart = DateTime.UtcNow;
     }
 
     /// <summary>
-    /// Boosts overlay background opacity when background content is mixed (high variance).
-    /// This improves readability when the overlay sits over text or split-tone content.
+    /// Sets the readability alpha boost based on background variance.
+    /// Instead of immediately replacing the brush (which causes flicker),
+    /// this stores the target boost and smoothly applies it on the next
+    /// transition frame or SetImmediate call.
+    ///
+    /// If no transition is active, applies the boost directly but only
+    /// if the change is significant enough to warrant a visual update.
     /// </summary>
     public static void AdjustForReadability(double variance)
     {
         if (!_initialized) return;
 
-        // variance > 0.02 means moderately mixed, > 0.05 means very mixed
-        if (variance < 0.015) return; // Background is uniform — no boost needed
+        // Calculate target boost: variance 0.015..0.08 → alpha increase 0..60
+        byte newBoost = 0;
+        if (variance >= 0.015)
+            newBoost = (byte)Math.Min(60, (variance - 0.015) / 0.065 * 60);
 
+        _targetAlphaBoost = newBoost;
+
+        // If we're mid-transition, the boost is baked into OnTransitionFrame — don't touch brushes
+        if (_isTransitioning) return;
+
+        // Only apply if change is significant (>10 units) to avoid micro-flicker
+        if (Math.Abs(newBoost - _currentAlphaBoost) < 10) return;
+
+        _currentAlphaBoost = newBoost;
+
+        // Apply to current OverlayBackground
         var res = Application.Current.Resources;
-        if (res["OverlayBackground"] is SolidColorBrush currentBrush)
+        if (_currentPalette != null)
         {
-            var c = currentBrush.Color;
-            // Boost alpha: map variance 0.015..0.08 → alpha increase of 0..80
-            double boost = Math.Min(80, (variance - 0.015) / 0.065 * 80);
-            byte newAlpha = (byte)Math.Min(255, c.A + boost);
-
-            if (newAlpha != c.A)
-            {
-                res["OverlayBackground"] = new SolidColorBrush(
-                    Color.FromArgb(newAlpha, c.R, c.G, c.B));
-                AdaptiveDebugLog.Log($"Readability boost: variance={variance:F3}, alpha {c.A}→{newAlpha}");
-            }
+            var baseColor = GetColor(_currentPalette, "OverlayBackground");
+            byte finalAlpha = (byte)Math.Min(255, baseColor.A + newBoost);
+            res["OverlayBackground"] = new SolidColorBrush(
+                Color.FromArgb(finalAlpha, baseColor.R, baseColor.G, baseColor.B));
+            AdaptiveDebugLog.Log($"Readability: variance={variance:F3}, boost={newBoost}, alpha→{finalAlpha}");
         }
     }
 

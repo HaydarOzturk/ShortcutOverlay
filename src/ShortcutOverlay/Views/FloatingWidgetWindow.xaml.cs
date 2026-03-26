@@ -32,10 +32,10 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             }
         };
 
-        // Debounced timer — 150ms settle before sampling (fast enough to feel instant)
+        // Debounced timer — 200ms settle before sampling (enough to avoid flicker)
         _adaptiveDebounce = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(150)
+            Interval = TimeSpan.FromMilliseconds(200)
         };
         _adaptiveDebounce.Tick += (_, _) =>
         {
@@ -43,12 +43,18 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             RunAdaptiveCheck();
         };
 
-        // Continuous polling timer — runs every 1.5s while adaptive mode is active
+        // Continuous polling timer — runs every 3s while adaptive mode is active
+        // Kept gentle to avoid flicker; event-driven checks handle app switches
         _adaptivePollTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(1500)
+            Interval = TimeSpan.FromMilliseconds(3000)
         };
-        _adaptivePollTimer.Tick += (_, _) => RunAdaptiveCheck();
+        _adaptivePollTimer.Tick += (_, _) =>
+        {
+            // Don't poll while a transition is still running — would cause flicker
+            if (!ThemeAnimator.IsTransitioning)
+                RunAdaptiveCheck();
+        };
     }
 
     protected override void OnSourceInitialized(EventArgs e)
