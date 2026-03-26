@@ -22,6 +22,10 @@ public static class ThemeManager
         _currentFamily = family;
         _isAdaptiveMode = adaptive;
 
+        // Enable debug logging for adaptive mode so we can verify detection
+        if (adaptive)
+            ScreenBrightnessDetector.DebugLogging = true;
+
         var isDark = GetSystemTheme().Equals("dark", System.StringComparison.OrdinalIgnoreCase);
         _currentVariantIsDark = isDark;
 
