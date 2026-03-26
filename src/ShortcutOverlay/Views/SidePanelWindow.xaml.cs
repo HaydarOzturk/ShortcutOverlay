@@ -136,8 +136,7 @@ public partial class SidePanelWindow : Window, IOverlayMode
         {
             SlideOut();
             _overlayVisible = false;
-            Dispatcher.InvokeAsync(() => Hide(), System.Windows.Threading.DispatcherPriority.Background,
-                System.Windows.Threading.CancellationToken.None);
+            Dispatcher.BeginInvoke(new Action(() => Hide()), DispatcherPriority.Background);
         }
     }
 

@@ -1,11 +1,12 @@
 using System.Windows;
 using System.Windows.Controls;
-using Hardcodet.NotifyIcon.Wpf;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace ShortcutOverlay.Services;
 
 /// <summary>
 /// Service that manages the system tray icon and its context menu.
+/// Uses Hardcodet.NotifyIcon.Wpf for system tray integration.
 /// </summary>
 public class TrayIconService : IDisposable
 {
@@ -17,7 +18,21 @@ public class TrayIconService : IDisposable
 
     public void Initialize()
     {
-        _taskbarIcon = new TaskbarIcon();
+        _taskbarIcon = new TaskbarIcon
+        {
+            ToolTipText = "ShortcutOverlay — Ctrl+Shift+S to toggle"
+        };
+
+        // Use the default application icon
+        try
+        {
+            _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
+        }
+        catch
+        {
+            // Fallback: icon may fail on some configurations, tray still works
+            System.Diagnostics.Debug.WriteLine("Could not set tray icon; using default.");
+        }
 
         // Create context menu programmatically
         var contextMenu = new ContextMenu();
@@ -39,11 +54,6 @@ public class TrayIconService : IDisposable
         contextMenu.Items.Add(quitItem);
 
         _taskbarIcon.ContextMenu = contextMenu;
-
-        // Set a placeholder icon (generic application icon)
-        // In a real implementation, you'd load a proper icon file here
-        _taskbarIcon.IconSource = new System.Windows.Media.Imaging.BitmapImage(
-            new Uri("pack://application:,,,/Resources/Icons/app-icon.ico", UriKind.RelativeOrAbsolute));
 
         // Handle left-click on the icon
         _taskbarIcon.TrayLeftMouseUp += (_, _) => ToggleOverlayRequested?.Invoke();

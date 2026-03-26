@@ -2,50 +2,59 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ShortcutOverlay.Controls">
-    <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="12">
-            <ItemsControl ItemsSource="{Binding Categories, RelativeSource={RelativeSource AncestorType=local:ShortcutListControl}}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Margin="0,0,0,16">
-                            <!-- Category Header -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding Categories, RelativeSource={RelativeSource AncestorType=local:ShortcutListControl}}"
+                      Margin="8">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,0,0,12">
+                        <!-- Category Header with divider line -->
+                        <Border BorderBrush="{DynamicResource CategoryDivider}"
+                                BorderThickness="0,0,0,1"
+                                Padding="4,4,4,6"
+                                Margin="0,0,0,6">
                             <TextBlock Text="{Binding Name}"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,8"
-                                       Foreground="{DynamicResource PrimaryText}"/>
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SecondaryText}"
+                                       Opacity="0.8" />
+                        </Border>
 
-                            <!-- Shortcuts List -->
-                            <ItemsControl ItemsSource="{Binding Shortcuts}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0,4,0,4">
+                        <!-- Shortcuts in containers, side-by-side keys + description -->
+                        <ItemsControl ItemsSource="{Binding Shortcuts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource ShortcutRowBackground}"
+                                            CornerRadius="6"
+                                            Padding="8,6"
+                                            Margin="0,2">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto" MinWidth="100"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Key Combo Display -->
+                                            <!-- Key badges (left side) -->
                                             <local:KeyComboDisplay Grid.Column="0"
                                                                    Keys="{Binding Keys}"
                                                                    VerticalAlignment="Center"
-                                                                   Margin="0,0,12,0"/>
+                                                                   Margin="0,0,10,0"/>
 
-                                            <!-- Description -->
+                                            <!-- Description (right side) -->
                                             <TextBlock Grid.Column="1"
                                                        Text="{Binding Description}"
                                                        FontSize="12"
                                                        TextWrapping="Wrap"
-                                                       Foreground="{DynamicResource SecondaryText}"
+                                                       Foreground="{DynamicResource PrimaryText}"
                                                        VerticalAlignment="Center"/>
                                         </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
 </UserControl>
