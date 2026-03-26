@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Apple Glass — Midnight Blue -->
+    <!-- Deep navy glass, ideal for dark/AMOLED screens and late-night use -->
+
+    <!-- Main overlay surface: deep navy translucent glass -->
+    <SolidColorBrush x:Key="OverlayBackground" Color="#B00A1628"/>
+    <SolidColorBrush x:Key="OverlayBorder" Color="#18608BFF"/>
+
+    <!-- Header: subtle blue-tinted layer -->
+    <SolidColorBrush x:Key="HeaderBackground" Color="#0A4080D0"/>
+
+    <!-- Text hierarchy -->
+    <SolidColorBrush x:Key="PrimaryText" Color="#F0D8E4FF"/>
+    <SolidColorBrush x:Key="SecondaryText" Color="#80A0BBEE"/>
+    <SolidColorBrush x:Key="TertiaryText" Color="#506888BB"/>
+
+    <!-- Key badges: frosted blue pill style -->
+    <SolidColorBrush x:Key="KeyBadgeBackground" Color="#203060A0"/>
+    <SolidColorBrush x:Key="KeyBadgeBorder" Color="#18406EBB"/>
+    <SolidColorBrush x:Key="KeyBadgeText" Color="#E0C8DAFF"/>
+
+    <!-- Search field: inset glass -->
+    <SolidColorBrush x:Key="SearchBackground" Color="#12304880"/>
+    <SolidColorBrush x:Key="SearchText" Color="#E0D0E0FF"/>
+    <SolidColorBrush x:Key="SearchPlaceholder" Color="#405878AA"/>
+    <SolidColorBrush x:Key="SearchBorder" Color="#10406EBB"/>
+
+    <!-- Shortcut row containers: subtle glass cards -->
+    <SolidColorBrush x:Key="ShortcutRowBackground" Color="#08203860"/>
+    <SolidColorBrush x:Key="ShortcutRowHover" Color="#15305888"/>
+    <SolidColorBrush x:Key="ShortcutRowBorder" Color="#08304878"/>
+
+    <!-- Category dividers -->
+    <SolidColorBrush x:Key="CategoryDivider" Color="#10406090"/>
+
+    <!-- Footer buttons -->
+    <SolidColorBrush x:Key="FooterButtonBackground" Color="#10304880"/>
+    <SolidColorBrush x:Key="FooterButtonHover" Color="#20406EBB"/>
+    <SolidColorBrush x:Key="FooterButtonText" Color="#90A0C0EE"/>
+
+    <!-- Accent color (electric blue) -->
+    <SolidColorBrush x:Key="AccentColor" Color="#FF3B82F6"/>
+    <SolidColorBrush x:Key="AccentColorSubtle" Color="#203B82F6"/>
+
+    <!-- Scrollbar -->
+    <SolidColorBrush x:Key="ScrollbarThumb" Color="#25406EBB"/>
+    <SolidColorBrush x:Key="ScrollbarTrack" Color="#00000000"/>
+
+</ResourceDictionary>

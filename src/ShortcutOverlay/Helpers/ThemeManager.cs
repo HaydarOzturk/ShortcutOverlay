@@ -4,11 +4,38 @@ namespace ShortcutOverlay.Helpers;
 
 public static class ThemeManager
 {
+    /// <summary>
+    /// All available theme names (display name → XAML file name without extension).
+    /// </summary>
+    public static IReadOnlyList<(string DisplayName, string Key)> AvailableThemes { get; } = new List<(string, string)>
+    {
+        ("Dark",           "DarkTheme"),
+        ("Light",          "LightTheme"),
+        ("Midnight Blue",  "MidnightBlueTheme"),
+        ("Rose Gold",      "RoseGoldTheme"),
+        ("Ocean Teal",     "OceanTealTheme"),
+        ("Forest Green",   "ForestGreenTheme"),
+        ("Sunset Amber",   "SunsetAmberTheme"),
+    };
+
     public static void ApplyTheme(string theme)
     {
-        var actualTheme = theme == "auto" ? GetSystemTheme() : theme;
-        var themeFile = actualTheme.Equals("dark", StringComparison.OrdinalIgnoreCase)
-            ? "DarkTheme" : "LightTheme";
+        string themeFile;
+
+        if (theme.Equals("auto", StringComparison.OrdinalIgnoreCase))
+        {
+            themeFile = GetSystemTheme().Equals("dark", StringComparison.OrdinalIgnoreCase)
+                ? "DarkTheme" : "LightTheme";
+        }
+        else
+        {
+            // Try to match by key first, then by display name
+            var match = AvailableThemes.FirstOrDefault(t =>
+                t.Key.Equals(theme, StringComparison.OrdinalIgnoreCase) ||
+                t.DisplayName.Equals(theme, StringComparison.OrdinalIgnoreCase));
+
+            themeFile = match.Key ?? "DarkTheme";
+        }
 
         var uri = new Uri($"Resources/Styles/{themeFile}.xaml", UriKind.Relative);
         var dict = new ResourceDictionary { Source = uri };
