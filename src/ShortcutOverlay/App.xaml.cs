@@ -1,5 +1,6 @@
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using ShortcutOverlay.Helpers;
 using ShortcutOverlay.NativeInterop;
 using ShortcutOverlay.Services;
 using ShortcutOverlay.ViewModels;
@@ -34,6 +35,11 @@ public partial class App : Application
         services.AddTransient<TrayPopupWindow>();
 
         Services = services.BuildServiceProvider();
+
+        // Load and apply the user's theme from settings
+        var settingsService = Services.GetRequiredService<SettingsService>();
+        settingsService.LoadAsync().GetAwaiter().GetResult();
+        ThemeManager.ApplyTheme(settingsService.Current.Theme);
 
         // Start window detection
         var detection = Services.GetRequiredService<WindowDetectionService>();
