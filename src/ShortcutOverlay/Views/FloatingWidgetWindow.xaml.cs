@@ -25,7 +25,10 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         {
             if (args.PropertyName == nameof(MainViewModel.CurrentProfile) ||
                 args.PropertyName == nameof(MainViewModel.CurrentAppName))
+            {
+                AdaptiveDebugLog.Log($"PropertyChanged: {args.PropertyName} — triggering adaptive check");
                 TriggerAdaptiveCheck();
+            }
         };
 
         // Debounced timer — 400ms settle time before sampling on events
@@ -39,11 +42,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             RunAdaptiveCheck();
         };
 
-        // Continuous polling timer — runs every 1.5s while adaptive mode is active.
-        // Catches cases the event-driven approach misses:
-        //   • foreground app changed but profile stayed null/same
-        //   • user scrolled content behind overlay (dark → light region)
-        //   • window was resized or moved behind overlay
+        // Continuous polling timer — runs every 1.5s while adaptive mode is active
         _adaptivePollTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(1500)
@@ -56,6 +55,10 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         base.OnSourceInitialized(e);
         ForceTopmost();
         HideFromAltTab();
+
+        var myHwnd = new WindowInteropHelper(this).Handle;
+        AdaptiveDebugLog.Log($"OnSourceInitialized: myHwnd=0x{myHwnd:X}, IsAdaptiveMode={ThemeManager.IsAdaptiveMode}");
+
         TriggerAdaptiveCheck();
         StartAdaptivePolling();
     }
@@ -82,10 +85,6 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         TriggerAdaptiveCheck();
     }
 
-    /// <summary>
-    /// Triggers an immediate (debounced) adaptive check — used for event-driven
-    /// responses like app switch or drag-move.
-    /// </summary>
     private void TriggerAdaptiveCheck()
     {
         if (!ThemeManager.IsAdaptiveMode) return;
@@ -93,13 +92,13 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         _adaptiveDebounce.Start();
     }
 
-    /// <summary>
-    /// Starts the continuous poll timer. Call once after window is shown.
-    /// </summary>
     private void StartAdaptivePolling()
     {
         if (ThemeManager.IsAdaptiveMode && !_adaptivePollTimer.IsEnabled)
+        {
+            AdaptiveDebugLog.Log("StartAdaptivePolling: Starting 1.5s poll timer");
             _adaptivePollTimer.Start();
+        }
     }
 
     private void StopAdaptivePolling()
@@ -108,41 +107,90 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     }
 
     /// <summary>
-    /// Captures the foreground window via PrintWindow and analyzes the region
-    /// where our overlay sits. ThemeAnimator handles the smooth 200ms
-    /// color interpolation — no opacity tricks, no flicker.
+    /// Core adaptive check. Gets the foreground window, finds the actual app
+    /// window (not our overlay), and passes it to ThemeManager for brightness analysis.
+    /// Logs every bail-out point for diagnostics.
     /// </summary>
     private void RunAdaptiveCheck()
     {
-        if (!ThemeManager.IsAdaptiveMode || !_overlayVisible) return;
+        if (!ThemeManager.IsAdaptiveMode)
+        {
+            AdaptiveDebugLog.Log("RunAdaptiveCheck: SKIP — IsAdaptiveMode=false");
+            return;
+        }
+        if (!_overlayVisible)
+        {
+            AdaptiveDebugLog.Log("RunAdaptiveCheck: SKIP — overlay not visible");
+            return;
+        }
 
         try
         {
-            // Get the foreground window HWND (the app behind our overlay)
             var foregroundHwnd = Win32Api.GetForegroundWindow();
-
-            // Don't analyze our own window
             var myHwnd = new WindowInteropHelper(this).Handle;
+
+            AdaptiveDebugLog.Log($"RunAdaptiveCheck: foreground=0x{foregroundHwnd:X}, myHwnd=0x{myHwnd:X}");
+
+            // If our overlay is the foreground (shouldn't happen with WS_EX_NOACTIVATE,
+            // but can happen right after Show()/Activate()), find the window below us
             if (foregroundHwnd == myHwnd || foregroundHwnd == IntPtr.Zero)
-                return;
+            {
+                foregroundHwnd = FindWindowBelowUs(myHwnd);
+                AdaptiveDebugLog.Log($"  Own window detected, fallback below=0x{foregroundHwnd:X}");
+
+                if (foregroundHwnd == IntPtr.Zero)
+                {
+                    AdaptiveDebugLog.Log("  SKIP — no window found below us");
+                    return;
+                }
+            }
 
             // Convert overlay position to physical screen pixels (DPI-aware)
             var source = PresentationSource.FromVisual(this);
-            if (source?.CompositionTarget == null) return;
+            if (source?.CompositionTarget == null)
+            {
+                AdaptiveDebugLog.Log("  SKIP — PresentationSource or CompositionTarget is null");
+                return;
+            }
 
             var transform = source.CompositionTarget.TransformToDevice;
             var topLeft = transform.Transform(new Point(Left, Top));
             var size = transform.Transform(new Point(ActualWidth, ActualHeight));
+
+            AdaptiveDebugLog.Log($"  Overlay at screen ({(int)topLeft.X},{(int)topLeft.Y}) size ({(int)size.X},{(int)size.Y})");
 
             ThemeManager.AdaptToBackground(
                 foregroundHwnd,
                 (int)topLeft.X, (int)topLeft.Y,
                 (int)size.X, (int)size.Y);
         }
-        catch
+        catch (Exception ex)
         {
-            // Best-effort — don't crash if capture fails
+            AdaptiveDebugLog.Log($"  EXCEPTION: {ex.GetType().Name}: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Walks the Z-order starting from our window to find the first visible
+    /// window that isn't ours. Used when GetForegroundWindow returns our HWND.
+    /// </summary>
+    private static IntPtr FindWindowBelowUs(IntPtr ourHwnd)
+    {
+        var hwnd = ourHwnd;
+        for (int i = 0; i < 20; i++) // Safety limit
+        {
+            hwnd = Win32Api.GetWindow(hwnd, Win32Api.GW_HWNDNEXT);
+            if (hwnd == IntPtr.Zero) break;
+            if (hwnd == ourHwnd) continue;
+
+            // Skip invisible windows
+            if (!Win32Api.IsWindowVisible(hwnd)) continue;
+
+            // Check it has a reasonable size (skip tiny/zero-size windows)
+            if (Win32Api.GetWindowRect(hwnd, out var rect) && rect.Width > 100 && rect.Height > 100)
+                return hwnd;
+        }
+        return IntPtr.Zero;
     }
 
     public void ShowOverlay()

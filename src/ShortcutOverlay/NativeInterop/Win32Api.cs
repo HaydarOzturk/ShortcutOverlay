@@ -82,6 +82,15 @@ public static class Win32Api
     [DllImport("user32.dll")]
     public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
+    // --- Window Z-Order traversal (for finding window behind overlay) ---
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+    public const uint GW_HWNDNEXT = 2; // Next window in Z-order (below current)
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(IntPtr hWnd);
+
     // --- Window Capture (PrintWindow for adaptive brightness) ---
     [DllImport("user32.dll")]
     public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);

@@ -18,18 +18,21 @@ public static class ThemeManager
     /// </summary>
     public static void Initialize(string themeSetting)
     {
+        AdaptiveDebugLog.Enable();
+        AdaptiveDebugLog.Log($"ThemeManager.Initialize called with: '{themeSetting}'");
+
         ParseThemeSetting(themeSetting, out var family, out var adaptive);
         _currentFamily = family;
         _isAdaptiveMode = adaptive;
 
-        // Enable debug logging for adaptive mode so we can verify detection
-        if (adaptive)
-            ScreenBrightnessDetector.DebugLogging = true;
-
-        var isDark = GetSystemTheme().Equals("dark", System.StringComparison.OrdinalIgnoreCase);
+        var systemTheme = GetSystemTheme();
+        var isDark = systemTheme.Equals("dark", System.StringComparison.OrdinalIgnoreCase);
         _currentVariantIsDark = isDark;
 
+        AdaptiveDebugLog.Log($"  Parsed: family={family}, adaptive={adaptive}, systemTheme={systemTheme}, isDark={isDark}");
+
         var palette = GetPalette(family, isDark);
+        AdaptiveDebugLog.Log($"  Initial palette: {palette.Name}");
         ThemeAnimator.Initialize(palette);
     }
 
@@ -50,26 +53,34 @@ public static class ThemeManager
     }
 
     /// <summary>
-    /// Called by adaptive mode: captures the foreground window's content and analyzes
-    /// the region behind our overlay to determine light/dark, then smoothly transitions.
+    /// Called by adaptive mode: analyzes the foreground window's region
+    /// to determine light/dark, then smoothly transitions.
     /// </summary>
-    /// <param name="foregroundHwnd">HWND of the current foreground window</param>
     public static void AdaptToBackground(IntPtr foregroundHwnd,
         int overlayX, int overlayY, int overlayWidth, int overlayHeight)
     {
-        if (!_isAdaptiveMode) return;
+        if (!_isAdaptiveMode)
+        {
+            AdaptiveDebugLog.Log("AdaptToBackground: SKIP — not adaptive mode");
+            return;
+        }
 
         var isLight = ScreenBrightnessDetector.IsBackgroundLight(
             foregroundHwnd, overlayX, overlayY, overlayWidth, overlayHeight);
 
-        // Light background → dark overlay for contrast, and vice versa
+        // Light background → use light overlay (matches background vibe)
+        // Dark background → use dark overlay
         var wantDark = !isLight;
+
+        AdaptiveDebugLog.Log($"AdaptToBackground: isLight={isLight}, wantDark={wantDark}, currentIsDark={_currentVariantIsDark}");
 
         // Only transition if the variant actually needs to change
         if (wantDark == _currentVariantIsDark) return;
         _currentVariantIsDark = wantDark;
 
-        ThemeAnimator.TransitionTo(GetPalette(_currentFamily, wantDark));
+        var targetPalette = GetPalette(_currentFamily, wantDark);
+        AdaptiveDebugLog.Log($"  TRANSITIONING to palette: {targetPalette.Name}");
+        ThemeAnimator.TransitionTo(targetPalette);
     }
 
     private static ThemePalette GetPalette(string family, bool isDark)
