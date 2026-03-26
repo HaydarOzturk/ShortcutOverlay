@@ -43,11 +43,11 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             RunAdaptiveCheck();
         };
 
-        // Continuous polling timer — runs every 3s while adaptive mode is active
+        // Continuous polling timer — runs every 2s while adaptive mode is active
         // Kept gentle to avoid flicker; event-driven checks handle app switches
         _adaptivePollTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(3000)
+            Interval = TimeSpan.FromMilliseconds(2000)
         };
         _adaptivePollTimer.Tick += (_, _) =>
         {
@@ -103,7 +103,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     {
         if (ThemeManager.IsAdaptiveMode && !_adaptivePollTimer.IsEnabled)
         {
-            AdaptiveDebugLog.Log("StartAdaptivePolling: Starting 1.5s poll timer");
+            AdaptiveDebugLog.Log("StartAdaptivePolling: Starting 2s poll timer");
             _adaptivePollTimer.Start();
         }
     }
@@ -138,33 +138,34 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
 
             AdaptiveDebugLog.Log($"RunAdaptiveCheck: foreground=0x{foregroundHwnd:X}, myHwnd=0x{myHwnd:X}");
 
-            // If our overlay is the foreground (shouldn't happen with WS_EX_NOACTIVATE,
-            // but can happen right after Show()/Activate()), find the window below us
+            // If our overlay is the foreground or we got nothing, resolve the real window
             if (foregroundHwnd == myHwnd || foregroundHwnd == IntPtr.Zero)
             {
-                foregroundHwnd = FindWindowBelowUs(myHwnd);
-                AdaptiveDebugLog.Log($"  Own window detected, fallback below=0x{foregroundHwnd:X}");
+                // Try desktop FIRST — it's the most common case when all windows are minimized
+                // and FindWindow("Progman") is instant, no iteration needed
+                foregroundHwnd = FindDesktopWindow();
+                if (foregroundHwnd != IntPtr.Zero)
+                {
+                    AdaptiveDebugLog.Log($"  Resolved to desktop=0x{foregroundHwnd:X}");
+                }
+                else
+                {
+                    // Fall back to Z-order walk
+                    foregroundHwnd = FindWindowBelowUs(myHwnd);
+                    AdaptiveDebugLog.Log($"  Z-order fallback=0x{foregroundHwnd:X}");
+                }
 
                 if (foregroundHwnd == IntPtr.Zero)
                 {
-                    // No window below us — likely desktop is showing (all minimized).
-                    // Use the desktop window handle so we still sample the wallpaper.
-                    foregroundHwnd = FindDesktopWindow();
-                    AdaptiveDebugLog.Log($"  No window below, trying desktop=0x{foregroundHwnd:X}");
-
-                    if (foregroundHwnd == IntPtr.Zero)
-                    {
-                        AdaptiveDebugLog.Log("  SKIP — no window and no desktop found");
-                        return;
-                    }
+                    AdaptiveDebugLog.Log("  SKIP — no window found");
+                    return;
                 }
             }
 
-            // Also check if the foreground IS the desktop (Progman/WorkerW from explorer)
-            // This happens when user clicks on desktop or minimizes all windows
+            // Log if desktop is the foreground (helps with debugging)
             if (IsDesktopWindow(foregroundHwnd))
             {
-                AdaptiveDebugLog.Log($"  Desktop detected (foreground=0x{foregroundHwnd:X})");
+                AdaptiveDebugLog.Log($"  Desktop is foreground (0x{foregroundHwnd:X})");
             }
 
             // Convert overlay position to physical screen pixels (DPI-aware)
@@ -226,7 +227,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     private static IntPtr FindWindowBelowUs(IntPtr ourHwnd)
     {
         var hwnd = ourHwnd;
-        for (int i = 0; i < 20; i++) // Safety limit
+        for (int i = 0; i < 50; i++) // Increased limit — many hidden shell windows
         {
             hwnd = Win32Api.GetWindow(hwnd, Win32Api.GW_HWNDNEXT);
             if (hwnd == IntPtr.Zero) break;

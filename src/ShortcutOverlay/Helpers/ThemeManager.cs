@@ -8,8 +8,12 @@ namespace ShortcutOverlay.Helpers;
 /// High-level theme controller with per-app brightness caching.
 ///
 /// When switching to a KNOWN app, applies the cached theme INSTANTLY (0ms).
-/// Unknown apps get a fast 80ms transition after brightness detection.
-/// Background polling verifies and updates the cache every 1.5s.
+/// Unknown apps get a fast 100ms transition after brightness detection.
+/// Background polling verifies and updates the cache every 2s.
+///
+/// Desktop (wallpaper) gets special treatment: the cache is trusted longer
+/// because wallpaper is static and strip sampling can be noisy during
+/// window minimize/maximize animations.
 /// </summary>
 public static class ThemeManager
 {
@@ -20,6 +24,11 @@ public static class ThemeManager
     // Per-app brightness cache: process name → isDark
     // This is the key to instant switching — we remember what theme each app needs
     private static readonly ConcurrentDictionary<string, bool> _appBrightnessCache = new();
+
+    // Tracks how many consecutive same-result detections we've seen per app
+    // Prevents flip-flopping on a single noisy reading
+    private static readonly ConcurrentDictionary<string, int> _cacheConfidence = new();
+    private const int ConfidenceThreshold = 2; // Need 2 consecutive readings to flip cache
 
     public static bool IsAdaptiveMode => _isAdaptiveMode;
     public static string CurrentFamily => _currentFamily;
@@ -84,21 +93,40 @@ public static class ThemeManager
                 ThemeAnimator.SetImmediate(GetPalette(_currentFamily, cachedIsDark));
             }
 
-            // Still run detection in background to verify and update cache
+            // Verify cache in background — but require multiple consecutive readings to flip
             var isLight = ScreenBrightnessDetector.IsBackgroundLight(
                 foregroundHwnd, overlayX, overlayY, overlayWidth, overlayHeight);
             var freshIsDark = !isLight;
 
             if (freshIsDark != cachedIsDark)
             {
-                // Cache was wrong (app changed theme, window resized, etc.)
-                AdaptiveDebugLog.Log($"AdaptToBackground: Cache STALE for '{processName}': was={cachedIsDark}, now={freshIsDark}");
-                _appBrightnessCache[processName] = freshIsDark;
-                if (freshIsDark != _currentVariantIsDark)
+                // Increment counter for this disagreement
+                var key = processName + (freshIsDark ? "_dark" : "_light");
+                _cacheConfidence.AddOrUpdate(key, 1, (_, count) => count + 1);
+
+                if (_cacheConfidence.TryGetValue(key, out int count) && count >= ConfidenceThreshold)
                 {
-                    _currentVariantIsDark = freshIsDark;
-                    ThemeAnimator.TransitionFast(GetPalette(_currentFamily, freshIsDark));
+                    // Confirmed stale — update cache
+                    AdaptiveDebugLog.Log($"AdaptToBackground: Cache CONFIRMED STALE for '{processName}': was={cachedIsDark}, now={freshIsDark} (count={count})");
+                    _appBrightnessCache[processName] = freshIsDark;
+                    _cacheConfidence.TryRemove(key, out _);
+
+                    if (freshIsDark != _currentVariantIsDark)
+                    {
+                        _currentVariantIsDark = freshIsDark;
+                        ThemeAnimator.TransitionFast(GetPalette(_currentFamily, freshIsDark));
+                    }
                 }
+                else
+                {
+                    AdaptiveDebugLog.Log($"AdaptToBackground: Cache disagrees for '{processName}' (count={count}/{ConfidenceThreshold}), waiting for confirmation");
+                }
+            }
+            else
+            {
+                // Readings agree with cache — reset any disagreement counters
+                _cacheConfidence.TryRemove(processName + "_dark", out _);
+                _cacheConfidence.TryRemove(processName + "_light", out _);
             }
 
             // Adjust readability based on current background variance

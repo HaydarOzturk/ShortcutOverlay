@@ -13,15 +13,18 @@ namespace ShortcutOverlay.Helpers;
 ///
 /// Also returns brightness variance — high variance means mixed content (text on background),
 /// which the overlay can use to boost opacity for better readability.
+///
+/// Strips are clamped to screen work area (excludes taskbar) to avoid sampling
+/// the taskbar which is always dark and skews brightness detection.
 /// </summary>
 public static class ScreenBrightnessDetector
 {
-    // Hysteresis thresholds
-    private const double UpperThreshold = 0.58;
-    private const double LowerThreshold = 0.42;
+    // Hysteresis thresholds — wider dead zone to prevent flip-flopping
+    private const double UpperThreshold = 0.60;
+    private const double LowerThreshold = 0.40;
 
     // Strip width for sampling around overlay edges
-    private const int StripSize = 60;
+    private const int StripSize = 80;
 
     private static bool? _lastDecisionIsLight;
 
@@ -52,6 +55,8 @@ public static class ScreenBrightnessDetector
     /// Samples 4 strips immediately adjacent to the overlay and returns
     /// average brightness + variance. The strips sample what's visible on screen
     /// right next to where the overlay sits.
+    ///
+    /// All strips are clamped to the screen work area (excludes taskbar).
     /// </summary>
     private static (double brightness, double variance) SampleAroundOverlay(
         int oX, int oY, int oW, int oH)
@@ -59,21 +64,36 @@ public static class ScreenBrightnessDetector
         var hdcScreen = Win32Api.GetDC(IntPtr.Zero);
         if (hdcScreen == IntPtr.Zero) return (0.5, 0);
 
-        // Four strips surrounding the overlay:
+        // Get the work area (screen minus taskbar)
+        GetWorkArea(out int screenLeft, out int screenTop, out int screenRight, out int screenBottom);
+
+        // Four strips surrounding the overlay, clamped to work area:
         //   [  above  ]
         //   [L]      [R]
         //   [  below  ]
-        var strips = new (int x, int y, int w, int h)[]
-        {
-            // Left strip — right next to overlay's left edge
-            (Math.Max(0, oX - StripSize), oY, Math.Min(StripSize, oX), oH),
-            // Right strip — right next to overlay's right edge
-            (oX + oW, oY, StripSize, oH),
-            // Above strip — right above overlay
-            (oX, Math.Max(0, oY - StripSize), oW, Math.Min(StripSize, oY)),
-            // Below strip — right below overlay
-            (oX, oY + oH, oW, StripSize),
-        };
+        var strips = new List<(int x, int y, int w, int h)>();
+
+        // Left strip
+        int leftW = Math.Min(StripSize, oX - screenLeft);
+        if (leftW > 10)
+            strips.Add((oX - leftW, oY, leftW, oH));
+
+        // Right strip
+        int rightX = oX + oW;
+        int rightW = Math.Min(StripSize, screenRight - rightX);
+        if (rightW > 10)
+            strips.Add((rightX, oY, rightW, oH));
+
+        // Above strip
+        int aboveH = Math.Min(StripSize, oY - screenTop);
+        if (aboveH > 10)
+            strips.Add((oX, oY - aboveH, oW, aboveH));
+
+        // Below strip — clamped to work area bottom (NOT screen bottom, to avoid taskbar)
+        int belowY = oY + oH;
+        int belowH = Math.Min(StripSize, screenBottom - belowY);
+        if (belowH > 10)
+            strips.Add((oX, belowY, oW, belowH));
 
         var stripBrightnesses = new List<double>();
 
@@ -101,7 +121,7 @@ public static class ScreenBrightnessDetector
         if (stripBrightnesses.Count == 0)
             return (0.5, 0);
 
-        // Calculate weighted average (side strips weighted more — they're larger)
+        // Calculate average
         double avg = 0;
         foreach (var b in stripBrightnesses) avg += b;
         avg /= stripBrightnesses.Count;
@@ -114,6 +134,39 @@ public static class ScreenBrightnessDetector
 
         return (avg, variance);
     }
+
+    /// <summary>
+    /// Gets the work area of the primary monitor (screen minus taskbar).
+    /// </summary>
+    private static void GetWorkArea(out int left, out int top, out int right, out int bottom)
+    {
+        try
+        {
+            // SystemParametersInfo SPI_GETWORKAREA returns the desktop work area
+            if (SystemParametersInfo(0x0030 /* SPI_GETWORKAREA */, 0, out Win32Api.RECT rect, 0))
+            {
+                left = rect.Left;
+                top = rect.Top;
+                right = rect.Right;
+                bottom = rect.Bottom;
+                return;
+            }
+        }
+        catch { }
+
+        // Fallback: use full screen from GetSystemMetrics
+        left = 0;
+        top = 0;
+        right = GetSystemMetrics(0 /* SM_CXSCREEN */);
+        bottom = GetSystemMetrics(1 /* SM_CYSCREEN */);
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SystemParametersInfo(uint uiAction, uint uiParam,
+        out Win32Api.RECT pvParam, uint fWinIni);
+
+    [DllImport("user32.dll")]
+    private static extern int GetSystemMetrics(int nIndex);
 
     /// <summary>
     /// Fast pixel analysis using GetDIBits. Returns average perceived brightness (0..1).
@@ -183,6 +236,7 @@ public static class ScreenBrightnessDetector
 
     /// <summary>
     /// Applies hysteresis: only flips if brightness crosses the far threshold.
+    /// Dead zone 0.40–0.60 prevents rapid toggling for borderline backgrounds.
     /// </summary>
     private static bool ApplyHysteresis(double brightness)
     {

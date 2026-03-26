@@ -124,19 +124,21 @@ public static class ThemeAnimator
             return;
         }
 
+        // If we're mid-transition, snapshot the actual on-screen colors
+        // so the new transition starts from where we visually ARE
+        var wasTransitioning = _isTransitioning;
+
         _transitionTimer?.Stop();
         _isTransitioning = true;
         _lastTransitionStart = now;
 
-        // Snapshot current on-screen colors as the "from" state
-        // This handles mid-transition interrupts smoothly
-        _fromPalette = _isTransitioning ? SnapshotCurrentColors() : _currentPalette;
+        _fromPalette = wasTransitioning ? SnapshotCurrentColors() : _currentPalette;
         _toPalette = target;
         _currentFrame = 0;
         _totalFrames = Math.Max(1, durationMs / FrameIntervalMs);
         _currentPalette = target;
 
-        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: → {target.Name} ({durationMs}ms, {_totalFrames} frames)");
+        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: → {target.Name} ({durationMs}ms, {_totalFrames} frames, snapshot={wasTransitioning})");
 
         _transitionTimer?.Start();
     }
