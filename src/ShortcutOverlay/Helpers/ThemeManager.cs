@@ -162,10 +162,22 @@ public static class ThemeManager
         ThemeAnimator.AdjustForReadability(ScreenBrightnessDetector.LastBrightnessVariance);
     }
 
+    // Window classes that belong to the desktop shell.
+    // When any of these are the foreground, the user is looking at the desktop.
+    private static readonly HashSet<string> ShellWindowClasses = new(StringComparer.Ordinal)
+    {
+        "Progman",                    // Desktop wallpaper host
+        "WorkerW",                    // Alternative desktop host (wallpaper slideshow)
+        "Shell_TrayWnd",              // Main taskbar
+        "Shell_SecondaryTrayWnd",     // Secondary monitor taskbar
+        "NotifyIconOverflowWindow",   // System tray overflow
+        "Windows.UI.Core.CoreWindow", // Start menu / Action Center (when no app is focused)
+    };
+
     /// <summary>
     /// Gets the process name from a window handle.
-    /// Desktop windows (Progman/WorkerW) return "__desktop__" so they get
-    /// their own entry in the per-app brightness cache.
+    /// Desktop/shell windows return "__desktop__" so they share one cache entry
+    /// and don't pollute the "explorer" key (which is also used by File Explorer).
     /// </summary>
     private static string GetProcessName(IntPtr hwnd)
     {
@@ -173,11 +185,11 @@ public static class ThemeManager
         {
             if (hwnd == IntPtr.Zero) return string.Empty;
 
-            // Check if this is the desktop window — return a special cache key
+            // Check if this is a desktop/shell window — return a unified cache key
             var className = new StringBuilder(256);
             NativeInterop.Win32Api.GetClassName(hwnd, className, 256);
             var cls = className.ToString();
-            if (cls == "Progman" || cls == "WorkerW")
+            if (ShellWindowClasses.Contains(cls))
                 return "__desktop__";
 
             NativeInterop.Win32Api.GetWindowThreadProcessId(hwnd, out var pid);

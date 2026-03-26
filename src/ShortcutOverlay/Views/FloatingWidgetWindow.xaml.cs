@@ -113,6 +113,16 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         _adaptivePollTimer.Stop();
     }
 
+    // Window classes that belong to the desktop shell — when these are foreground,
+    // the user is looking at the desktop/wallpaper, not an app.
+    private static readonly HashSet<string> ShellWindowClasses = new(StringComparer.Ordinal)
+    {
+        "Progman", "WorkerW",
+        "Shell_TrayWnd", "Shell_SecondaryTrayWnd",
+        "NotifyIconOverflowWindow",
+        "Windows.UI.Core.CoreWindow",
+    };
+
     /// <summary>
     /// Core adaptive check. Gets the foreground window, finds the actual app
     /// window (not our overlay), and passes it to ThemeManager for brightness analysis.
@@ -142,7 +152,6 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             if (foregroundHwnd == myHwnd || foregroundHwnd == IntPtr.Zero)
             {
                 // Try desktop FIRST — it's the most common case when all windows are minimized
-                // and FindWindow("Progman") is instant, no iteration needed
                 foregroundHwnd = FindDesktopWindow();
                 if (foregroundHwnd != IntPtr.Zero)
                 {
@@ -150,7 +159,6 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
                 }
                 else
                 {
-                    // Fall back to Z-order walk
                     foregroundHwnd = FindWindowBelowUs(myHwnd);
                     AdaptiveDebugLog.Log($"  Z-order fallback=0x{foregroundHwnd:X}");
                 }
@@ -162,10 +170,18 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
                 }
             }
 
-            // Log if desktop is the foreground (helps with debugging)
-            if (IsDesktopWindow(foregroundHwnd))
+            // KEY FIX: When the foreground is any shell window (taskbar, tray, start menu),
+            // redirect to the Progman desktop handle. This ensures:
+            //   1. The cache key becomes "__desktop__" (not "explorer")
+            //   2. Brightness sampling reads the wallpaper area, not the taskbar
+            if (IsShellWindow(foregroundHwnd))
             {
-                AdaptiveDebugLog.Log($"  Desktop is foreground (0x{foregroundHwnd:X})");
+                var desktopHwnd = FindDesktopWindow();
+                if (desktopHwnd != IntPtr.Zero)
+                {
+                    AdaptiveDebugLog.Log($"  Shell window detected, redirecting to desktop=0x{desktopHwnd:X}");
+                    foregroundHwnd = desktopHwnd;
+                }
             }
 
             // Convert overlay position to physical screen pixels (DPI-aware)
@@ -194,15 +210,14 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     }
 
     /// <summary>
-    /// Checks if a window handle belongs to the desktop shell (Progman or WorkerW).
+    /// Checks if a window handle belongs to any desktop/shell window class.
     /// </summary>
-    private static bool IsDesktopWindow(IntPtr hwnd)
+    private static bool IsShellWindow(IntPtr hwnd)
     {
         if (hwnd == IntPtr.Zero) return false;
         var className = new StringBuilder(256);
         Win32Api.GetClassName(hwnd, className, 256);
-        var cls = className.ToString();
-        return cls == "Progman" || cls == "WorkerW";
+        return ShellWindowClasses.Contains(className.ToString());
     }
 
     /// <summary>
