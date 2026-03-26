@@ -82,7 +82,24 @@ public static class Win32Api
     [DllImport("user32.dll")]
     public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
-    // --- Screen Capture (for adaptive brightness detection) ---
+    // --- Window Capture (PrintWindow for adaptive brightness) ---
+    [DllImport("user32.dll")]
+    public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+
+    public const uint PW_RENDERFULLCONTENT = 0x00000002; // Win 8.1+ DWM-aware capture
+
+    [DllImport("user32.dll")]
+    public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left, Top, Right, Bottom;
+        public int Width => Right - Left;
+        public int Height => Bottom - Top;
+    }
+
+    // --- Screen Capture (GDI helpers) ---
     [DllImport("user32.dll")]
     public static extern IntPtr GetDC(IntPtr hWnd);
 

@@ -46,15 +46,17 @@ public static class ThemeManager
     }
 
     /// <summary>
-    /// Called by adaptive mode: samples screen brightness and smoothly transitions
-    /// to the appropriate variant.
+    /// Called by adaptive mode: captures the foreground window's content and analyzes
+    /// the region behind our overlay to determine light/dark, then smoothly transitions.
     /// </summary>
-    public static void AdaptToBackground(int overlayX, int overlayY, int overlayWidth, int overlayHeight)
+    /// <param name="foregroundHwnd">HWND of the current foreground window</param>
+    public static void AdaptToBackground(IntPtr foregroundHwnd,
+        int overlayX, int overlayY, int overlayWidth, int overlayHeight)
     {
         if (!_isAdaptiveMode) return;
 
         var isLight = ScreenBrightnessDetector.IsBackgroundLight(
-            overlayX, overlayY, overlayWidth, overlayHeight);
+            foregroundHwnd, overlayX, overlayY, overlayWidth, overlayHeight);
 
         // Light background → dark overlay for contrast, and vice versa
         var wantDark = !isLight;

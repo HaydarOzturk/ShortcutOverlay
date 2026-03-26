@@ -76,8 +76,9 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     }
 
     /// <summary>
-    /// Samples strips around the overlay. ThemeAnimator handles the smooth
-    /// 200ms color interpolation — no opacity tricks needed.
+    /// Captures the foreground window via PrintWindow and analyzes the region
+    /// where our overlay sits. ThemeAnimator handles the smooth 200ms
+    /// color interpolation — no opacity tricks, no flicker.
     /// </summary>
     private void RunAdaptiveCheck()
     {
@@ -85,6 +86,15 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
 
         try
         {
+            // Get the foreground window HWND (the app behind our overlay)
+            var foregroundHwnd = Win32Api.GetForegroundWindow();
+
+            // Don't analyze our own window
+            var myHwnd = new WindowInteropHelper(this).Handle;
+            if (foregroundHwnd == myHwnd || foregroundHwnd == IntPtr.Zero)
+                return;
+
+            // Convert overlay position to physical screen pixels (DPI-aware)
             var source = PresentationSource.FromVisual(this);
             if (source?.CompositionTarget == null) return;
 
@@ -93,12 +103,13 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             var size = transform.Transform(new Point(ActualWidth, ActualHeight));
 
             ThemeManager.AdaptToBackground(
+                foregroundHwnd,
                 (int)topLeft.X, (int)topLeft.Y,
                 (int)size.X, (int)size.Y);
         }
         catch
         {
-            // Best-effort — don't crash if screen capture fails
+            // Best-effort — don't crash if capture fails
         }
     }
 
