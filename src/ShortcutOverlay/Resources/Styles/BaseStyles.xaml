@@ -30,7 +30,7 @@
     <Style TargetType="TextBox">
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="{DynamicResource OverlayBorder}"/>
-        <Setter Property="Background" Value="{DynamicResource SearchBackground, FallbackValue=#10000000}"/>
+        <Setter Property="Background" Value="{DynamicResource SearchBackground}"/>
         <Setter Property="Foreground" Value="{DynamicResource SearchText}"/>
         <Setter Property="Padding" Value="8,6"/>
         <Setter Property="Template">

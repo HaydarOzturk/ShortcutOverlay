@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using ShortcutOverlay.Models;
 using ShortcutOverlay.NativeInterop;
@@ -116,7 +117,7 @@ public sealed class WindowDetectionService : IDisposable
 
         Win32Api.EnumChildWindows(hwnd, EnumCallback, IntPtr.Zero);
 
-        return foundApps.FirstOrDefault("uwp-app") ?? "uwp-app";
+        return foundApps.FirstOrDefault() ?? "uwp-app";
     }
 
     /// <summary>

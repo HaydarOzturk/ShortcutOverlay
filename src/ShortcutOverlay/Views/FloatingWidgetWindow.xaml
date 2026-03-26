@@ -26,33 +26,36 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
             <!-- Row 0: Header -->
-            <Grid Grid.Row="0"
-                  Background="{DynamicResource HeaderBackground}"
-                  Padding="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0"
-                           Text="{Binding CurrentAppName}"
-                           Foreground="{DynamicResource PrimaryText}"
-                           FontWeight="Bold"
-                           FontSize="14"
-                           VerticalAlignment="Center" />
-                <Button Grid.Column="1"
-                        Content="▼"
-                        Width="24"
-                        Height="24"
-                        Padding="0"
-                        Background="Transparent"
-                        Foreground="{DynamicResource SecondaryText}"
-                        BorderThickness="0"
-                        FontSize="12" />
-            </Grid>
+            <Border Grid.Row="0"
+                    Background="{DynamicResource HeaderBackground}"
+                    Padding="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding CurrentAppName}"
+                               Foreground="{DynamicResource PrimaryText}"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Content="&#x25BC;"
+                            Width="24"
+                            Height="24"
+                            Padding="0"
+                            Background="Transparent"
+                            Foreground="{DynamicResource SecondaryText}"
+                            BorderThickness="0"
+                            FontSize="12" />
+                </Grid>
+            </Border>
 
             <!-- Row 1: Search -->
-            <Grid Grid.Row="1" Padding="12,8">
+            <Border Grid.Row="1" Padding="12,8">
                 <TextBox x:Name="SearchBox"
                          Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Padding="8,6"
@@ -62,11 +65,11 @@
                          BorderBrush="{DynamicResource OverlayBorder}"
                          BorderThickness="1"
                          ToolTip="Search shortcuts..." />
-            </Grid>
+            </Border>
 
             <!-- Row 2: Shortcuts List -->
             <ScrollViewer Grid.Row="2"
-                          Padding="8"
+                          Margin="8"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding FilteredCategories}">
@@ -131,38 +134,40 @@
             </ScrollViewer>
 
             <!-- Row 3: Footer -->
-            <Grid Grid.Row="3"
-                  Background="{DynamicResource HeaderBackground}"
-                  Padding="12"
-                  Height="40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Border Grid.Row="3"
+                    Background="{DynamicResource HeaderBackground}"
+                    Padding="12"
+                    Height="40">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0"
-                        Content="Edit Shortcuts"
-                        Padding="8,6"
-                        Margin="0,0,4,0"
-                        Background="{DynamicResource KeyBadgeBackground}"
-                        Foreground="{DynamicResource KeyBadgeText}"
-                        BorderBrush="{DynamicResource KeyBadgeBorder}"
-                        BorderThickness="1"
-                        FontSize="11"
-                        FontWeight="SemiBold" />
+                    <Button Grid.Column="0"
+                            Content="Edit Shortcuts"
+                            Padding="8,6"
+                            Margin="0,0,4,0"
+                            Background="{DynamicResource KeyBadgeBackground}"
+                            Foreground="{DynamicResource KeyBadgeText}"
+                            BorderBrush="{DynamicResource KeyBadgeBorder}"
+                            BorderThickness="1"
+                            FontSize="11"
+                            FontWeight="SemiBold" />
 
-                <Button Grid.Column="1"
-                        Content="Settings"
-                        Command="{Binding OpenSettingsCommand}"
-                        Padding="8,6"
-                        Margin="4,0,0,0"
-                        Background="{DynamicResource KeyBadgeBackground}"
-                        Foreground="{DynamicResource KeyBadgeText}"
-                        BorderBrush="{DynamicResource KeyBadgeBorder}"
-                        BorderThickness="1"
-                        FontSize="11"
-                        FontWeight="SemiBold" />
-            </Grid>
+                    <Button Grid.Column="1"
+                            Content="Settings"
+                            Command="{Binding OpenSettingsCommand}"
+                            Padding="8,6"
+                            Margin="4,0,0,0"
+                            Background="{DynamicResource KeyBadgeBackground}"
+                            Foreground="{DynamicResource KeyBadgeText}"
+                            BorderBrush="{DynamicResource KeyBadgeBorder}"
+                            BorderThickness="1"
+                            FontSize="11"
+                            FontWeight="SemiBold" />
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>
