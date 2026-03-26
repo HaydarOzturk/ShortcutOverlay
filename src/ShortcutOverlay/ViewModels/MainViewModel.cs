@@ -81,7 +81,7 @@ public partial class MainViewModel : ObservableObject
 
         var filter = SearchFilter?.ToLower() ?? string.Empty;
 
-        foreach (var category in CurrentProfile.Categories)
+        foreach (var category in CurrentProfile.Categories.OrderBy(c => c.SortOrder))
         {
             var filteredShortcuts = new List<ShortcutEntry>();
 

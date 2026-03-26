@@ -11,6 +11,55 @@
         MouseEnter="Window_MouseEnter"
         MouseLeave="Window_MouseLeave">
 
+    <!-- Context menu — same as FloatingWidget -->
+    <Window.ContextMenu>
+        <ContextMenu Style="{StaticResource GlassContextMenu}">
+            <MenuItem Header="🎨  Theme" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="Classic" Click="ThemeMenuItem_Click" Tag="Classic"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Midnight Blue" Click="ThemeMenuItem_Click" Tag="MidnightBlue"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Rose Gold" Click="ThemeMenuItem_Click" Tag="RoseGold"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Ocean Teal" Click="ThemeMenuItem_Click" Tag="OceanTeal"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Forest Green" Click="ThemeMenuItem_Click" Tag="ForestGreen"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Sunset Amber" Click="ThemeMenuItem_Click" Tag="SunsetAmber"
+                          Style="{StaticResource GlassMenuItem}" />
+                <Separator Style="{StaticResource GlassMenuSeparator}" />
+                <MenuItem Header="Adaptive" Click="ThemeMenuItem_Click" Tag="Adaptive"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <MenuItem Header="◐  Opacity" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="60%" Click="OpacityMenuItem_Click" Tag="0.60"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="70%" Click="OpacityMenuItem_Click" Tag="0.70"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="80%" Click="OpacityMenuItem_Click" Tag="0.80"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="90%" Click="OpacityMenuItem_Click" Tag="0.90"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="100%" Click="OpacityMenuItem_Click" Tag="1.00"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <MenuItem Header="📐  Display Mode" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="Floating Widget" Click="DisplayModeMenuItem_Click" Tag="floating"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Side Panel" Click="DisplayModeMenuItem_Click" Tag="sidepanel"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Tray Popup" Click="DisplayModeMenuItem_Click" Tag="tray"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <Separator Style="{StaticResource GlassMenuSeparator}" />
+            <MenuItem Header="ℹ  About" Style="{StaticResource GlassMenuItem}"
+                      Click="About_Click" />
+            <Separator Style="{StaticResource GlassMenuSeparator}" />
+            <MenuItem Header="✕  Quit" Style="{StaticResource GlassMenuItem}"
+                      Click="Quit_Click" />
+        </ContextMenu>
+    </Window.ContextMenu>
+
     <Border Background="{DynamicResource OverlayBackground}"
             BorderBrush="{DynamicResource OverlayBorder}"
             BorderThickness="0,0,0.5,0">
@@ -25,27 +74,56 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Header -->
+            <!-- Header: compact icon + name + menu -->
             <Border Grid.Row="0"
-                    Padding="14,14"
+                    Padding="10,8"
                     BorderBrush="{DynamicResource CategoryDivider}"
                     BorderThickness="0,0,0,0.5">
-                <TextBlock Text="{Binding CurrentAppName}"
-                           Foreground="{DynamicResource PrimaryText}"
-                           FontWeight="SemiBold"
-                           FontSize="15"
-                           FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse Grid.Column="0"
+                             Width="10" Height="10"
+                             Fill="{DynamicResource AccentColor}"
+                             Margin="0,0,8,0"
+                             VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding CurrentAppName}"
+                               Foreground="{DynamicResource PrimaryText}"
+                               FontWeight="SemiBold"
+                               FontSize="13"
+                               FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="200"
+                               Effect="{StaticResource TextShadowLight}" />
+
+                    <TextBlock Grid.Column="2"
+                               Text="⋮"
+                               Foreground="{DynamicResource SecondaryText}"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="MenuIcon_Click"
+                               ToolTip="Menu" />
+                </Grid>
             </Border>
 
             <!-- Search -->
-            <Border Grid.Row="1" Padding="12,8">
+            <Border Grid.Row="1" Padding="8,6">
                 <Border Background="{DynamicResource SearchBackground}"
                         BorderBrush="{DynamicResource SearchBorder}"
                         BorderThickness="0.5"
                         CornerRadius="8">
                     <TextBox Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Padding="10,7"
-                             FontSize="13"
+                             Padding="10,6"
+                             FontSize="12"
                              FontFamily="SF Pro Text, Segoe UI, sans-serif"
                              Foreground="{DynamicResource SearchText}"
                              Background="Transparent"

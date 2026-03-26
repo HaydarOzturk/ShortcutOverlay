@@ -1,9 +1,11 @@
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using ShortcutOverlay.Helpers;
 using ShortcutOverlay.NativeInterop;
+using ShortcutOverlay.Services;
 using ShortcutOverlay.ViewModels;
 
 namespace ShortcutOverlay.Views;
@@ -11,6 +13,7 @@ namespace ShortcutOverlay.Views;
 public partial class FloatingWidgetWindow : Window, IOverlayMode
 {
     private bool _overlayVisible = true;
+    private bool _isPinned = true; // Always-on-top state
     private readonly DispatcherTimer _adaptiveDebounce;
     private readonly DispatcherTimer _adaptivePollTimer;
 
@@ -60,7 +63,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        ForceTopmost();
+        if (_isPinned) ForceTopmost();
         HideFromAltTab();
 
         var myHwnd = new WindowInteropHelper(this).Handle;
@@ -78,6 +81,14 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             Win32Api.SWP_NOMOVE | Win32Api.SWP_NOSIZE | Win32Api.SWP_NOACTIVATE);
     }
 
+    private void RemoveTopmost()
+    {
+        var handle = new WindowInteropHelper(this).Handle;
+        Win32Api.SetWindowPos(handle, Win32Api.HWND_NOTOPMOST,
+            0, 0, 0, 0,
+            Win32Api.SWP_NOMOVE | Win32Api.SWP_NOSIZE | Win32Api.SWP_NOACTIVATE);
+    }
+
     private void HideFromAltTab()
     {
         var handle = new WindowInteropHelper(this).Handle;
@@ -91,6 +102,107 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         DragMove();
         TriggerAdaptiveCheck();
     }
+
+    // ── Icon tray click handlers ──
+
+    private void PinIcon_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        _isPinned = !_isPinned;
+        PinIcon.Text = _isPinned ? "📌" : "📍";
+        PinIcon.ToolTip = _isPinned ? "Unpin (disable always on top)" : "Pin (enable always on top)";
+
+        if (_isPinned)
+        {
+            Topmost = true;
+            ForceTopmost();
+        }
+        else
+        {
+            Topmost = false;
+            RemoveTopmost();
+        }
+    }
+
+    private void MenuIcon_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (ContextMenu != null)
+        {
+            ContextMenu.PlacementTarget = MenuIcon;
+            ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            ContextMenu.IsOpen = true;
+        }
+    }
+
+    // ── Context menu handlers ──
+
+    private void ThemeMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag)
+        {
+            var settings = SettingsService.Instance;
+            string themeSetting;
+
+            if (tag.Equals("Adaptive", StringComparison.OrdinalIgnoreCase))
+            {
+                // Adaptive mode uses current family
+                themeSetting = $"adaptive:{ThemeManager.CurrentFamily}";
+            }
+            else
+            {
+                themeSetting = tag;
+            }
+
+            var newSettings = settings.Current with { Theme = themeSetting };
+            settings.UpdateAsync(newSettings).ConfigureAwait(false);
+            ThemeManager.ApplyTheme(themeSetting);
+        }
+    }
+
+    private void OpacityMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag && double.TryParse(tag, out double opacity))
+        {
+            Opacity = opacity;
+            var settings = SettingsService.Instance;
+            var newSettings = settings.Current with { Opacity = opacity };
+            settings.UpdateAsync(newSettings).ConfigureAwait(false);
+        }
+    }
+
+    private void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag)
+        {
+            // TODO: Wire up display mode switching via MainViewModel
+            System.Diagnostics.Debug.WriteLine($"Display mode switch requested: {tag}");
+        }
+    }
+
+    private void EditShortcuts_Click(object sender, RoutedEventArgs e)
+    {
+        System.Diagnostics.Debug.WriteLine("Edit shortcuts not yet implemented.");
+    }
+
+    private void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm)
+            vm.OpenSettingsCommand.Execute(null);
+    }
+
+    private void About_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("ShortcutOverlay v1.0\nA minimalist keyboard shortcut overlay.",
+            "About", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void Quit_Click(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
+    }
+
+    // ── Adaptive theme logic (unchanged) ──
 
     private void TriggerAdaptiveCheck()
     {

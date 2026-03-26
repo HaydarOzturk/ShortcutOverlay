@@ -5,7 +5,68 @@
     <DropShadowEffect x:Key="TextShadow" BlurRadius="4" ShadowDepth="0" Opacity="0.35" Color="Black"/>
     <DropShadowEffect x:Key="TextShadowLight" BlurRadius="3" ShadowDepth="0" Opacity="0.2" Color="Black"/>
 
-    <!-- Apple Glass — Footer Button -->
+    <!-- ── Glass Context Menu ── -->
+    <Style x:Key="GlassContextMenu" TargetType="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource OverlayBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OverlayBorder}"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
+        <Setter Property="Padding" Value="4,6"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
+        <Setter Property="FontFamily" Value="SF Pro Text, Segoe UI, sans-serif"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HasDropShadow" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.3" Color="#000000"/>
+                        </Border.Effect>
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Glass MenuItem — uses default template for submenu support, just overrides colors -->
+    <Style x:Key="GlassMenuItem" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
+        <Setter Property="FontFamily" Value="SF Pro Text, Segoe UI, sans-serif"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ShortcutRowHover}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Glass Menu Separator -->
+    <Style x:Key="GlassMenuSeparator" TargetType="Separator">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="8,4"/>
+        <Setter Property="Background" Value="{DynamicResource CategoryDivider}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Background="{TemplateBinding Background}"
+                            Height="{TemplateBinding Height}"
+                            Margin="{TemplateBinding Margin}"
+                            SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Apple Glass — Footer Button (kept for backward compatibility but no longer used in FloatingWidget) -->
     <Style x:Key="FooterButton" TargetType="Button">
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Background" Value="{DynamicResource FooterButtonBackground}"/>

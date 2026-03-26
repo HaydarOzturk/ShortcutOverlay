@@ -180,6 +180,41 @@ public sealed class ProfileManager
     }
 
     /// <summary>
+    /// Saves a new category ordering for a given profile.
+    /// Creates a new profile record with updated SortOrder values and persists it.
+    /// </summary>
+    public async Task SaveCategoryOrderAsync(string profileId, IReadOnlyList<string> orderedCategoryNames)
+    {
+        var profile = AllProfiles.FirstOrDefault(p =>
+            p.ProfileId.Equals(profileId, StringComparison.OrdinalIgnoreCase));
+        if (profile == null) return;
+
+        var reorderedCategories = new List<ShortcutCategory>();
+        for (int i = 0; i < orderedCategoryNames.Count; i++)
+        {
+            var name = orderedCategoryNames[i];
+            var existing = profile.Categories.FirstOrDefault(c =>
+                c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                reorderedCategories.Add(existing with { SortOrder = i });
+            }
+        }
+
+        // Append any categories that weren't in the ordered list (safety)
+        foreach (var cat in profile.Categories)
+        {
+            if (!reorderedCategories.Any(c => c.Name.Equals(cat.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                reorderedCategories.Add(cat with { SortOrder = reorderedCategories.Count });
+            }
+        }
+
+        var updatedProfile = profile with { Categories = reorderedCategories };
+        await SaveProfileAsync(updatedProfile);
+    }
+
+    /// <summary>
     /// Reloads all profiles from disk.
     /// </summary>
     public void Reload()

@@ -50,6 +50,11 @@ public partial class App : Application
 
         // Create and show the floating widget window (default mode)
         var window = Services.GetRequiredService<FloatingWidgetWindow>();
+
+        // Apply saved opacity
+        if (settingsService.Current.Opacity > 0 && settingsService.Current.Opacity <= 1.0)
+            window.Opacity = settingsService.Current.Opacity;
+
         window.Show();
         viewModel.ActiveOverlay = window;
 

@@ -8,9 +8,62 @@
         Topmost="True"
         ShowInTaskbar="False"
         Width="340"
-        Height="500"
+        Height="600"
         ResizeMode="NoResize"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <!-- Context menu — accessible via right-click anywhere or ⋮ icon -->
+    <Window.ContextMenu>
+        <ContextMenu Style="{StaticResource GlassContextMenu}">
+            <MenuItem Header="🎨  Theme" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="Classic" Click="ThemeMenuItem_Click" Tag="Classic"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Midnight Blue" Click="ThemeMenuItem_Click" Tag="MidnightBlue"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Rose Gold" Click="ThemeMenuItem_Click" Tag="RoseGold"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Ocean Teal" Click="ThemeMenuItem_Click" Tag="OceanTeal"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Forest Green" Click="ThemeMenuItem_Click" Tag="ForestGreen"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Sunset Amber" Click="ThemeMenuItem_Click" Tag="SunsetAmber"
+                          Style="{StaticResource GlassMenuItem}" />
+                <Separator Style="{StaticResource GlassMenuSeparator}" />
+                <MenuItem Header="Adaptive" Click="ThemeMenuItem_Click" Tag="Adaptive"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <MenuItem Header="◐  Opacity" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="60%" Click="OpacityMenuItem_Click" Tag="0.60"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="70%" Click="OpacityMenuItem_Click" Tag="0.70"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="80%" Click="OpacityMenuItem_Click" Tag="0.80"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="90%" Click="OpacityMenuItem_Click" Tag="0.90"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="100%" Click="OpacityMenuItem_Click" Tag="1.00"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <MenuItem Header="📐  Display Mode" Style="{StaticResource GlassMenuItem}">
+                <MenuItem Header="Floating Widget" Click="DisplayModeMenuItem_Click" Tag="floating"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Side Panel" Click="DisplayModeMenuItem_Click" Tag="sidepanel"
+                          Style="{StaticResource GlassMenuItem}" />
+                <MenuItem Header="Tray Popup" Click="DisplayModeMenuItem_Click" Tag="tray"
+                          Style="{StaticResource GlassMenuItem}" />
+            </MenuItem>
+            <Separator Style="{StaticResource GlassMenuSeparator}" />
+            <MenuItem Header="✏️  Edit Shortcuts" Style="{StaticResource GlassMenuItem}"
+                      Click="EditShortcuts_Click" />
+            <MenuItem Header="⚙  Settings" Style="{StaticResource GlassMenuItem}"
+                      Click="Settings_Click" />
+            <MenuItem Header="ℹ  About" Style="{StaticResource GlassMenuItem}"
+                      Click="About_Click" />
+            <Separator Style="{StaticResource GlassMenuSeparator}" />
+            <MenuItem Header="✕  Quit" Style="{StaticResource GlassMenuItem}"
+                      Click="Quit_Click" />
+        </ContextMenu>
+    </Window.ContextMenu>
 
     <!-- Outer glass container with Apple-style rounded corners and glow -->
     <Border CornerRadius="14"
@@ -27,42 +80,68 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Header: app name with subtle glass separator -->
+            <!-- Header: compact icon tray — [AppIcon] [AppName] [Spacer] [Pin] [Menu] -->
             <Border Grid.Row="0"
-                    Padding="14,12"
+                    Padding="10,8"
                     BorderBrush="{DynamicResource CategoryDivider}"
                     BorderThickness="0,0,0,0.5"
                     CornerRadius="14,14,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
+                    <!-- App icon indicator -->
+                    <Ellipse Grid.Column="0"
+                             Width="10" Height="10"
+                             Fill="{DynamicResource AccentColor}"
+                             Margin="0,0,8,0"
+                             VerticalAlignment="Center" />
+
+                    <!-- App name — truncated, compact -->
+                    <TextBlock Grid.Column="1"
                                Text="{Binding CurrentAppName}"
                                Foreground="{DynamicResource PrimaryText}"
                                FontWeight="SemiBold"
-                               FontSize="15"
+                               FontSize="13"
                                FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
                                VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="200"
                                Effect="{StaticResource TextShadowLight}" />
 
-                    <!-- Hamburger menu icon -->
-                    <TextBlock Grid.Column="1"
-                               Text="&#x2630;"
-                               Foreground="{DynamicResource TertiaryText}"
-                               FontSize="16"
+                    <!-- Pin toggle icon -->
+                    <TextBlock x:Name="PinIcon"
+                               Grid.Column="2"
+                               Text="📌"
+                               FontSize="12"
                                VerticalAlignment="Center"
-                               Cursor="Hand" />
+                               Cursor="Hand"
+                               Margin="0,0,10,0"
+                               MouseLeftButtonDown="PinIcon_Click"
+                               ToolTip="Toggle always on top" />
+
+                    <!-- Menu icon — opens context menu -->
+                    <TextBlock x:Name="MenuIcon"
+                               Grid.Column="3"
+                               Text="⋮"
+                               Foreground="{DynamicResource SecondaryText}"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="MenuIcon_Click"
+                               ToolTip="Menu" />
                 </Grid>
             </Border>
 
             <!-- Search: inset glass field -->
-            <Border Grid.Row="1" Padding="12,8">
+            <Border Grid.Row="1" Padding="8,6">
                 <Border Background="{DynamicResource SearchBackground}"
                         BorderBrush="{DynamicResource SearchBorder}"
                         BorderThickness="0.5"
@@ -70,8 +149,8 @@
                         Padding="0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Padding="10,7"
-                             FontSize="13"
+                             Padding="10,6"
+                             FontSize="12"
                              FontFamily="SF Pro Text, Segoe UI, sans-serif"
                              Foreground="{DynamicResource SearchText}"
                              Background="Transparent"
@@ -84,31 +163,6 @@
             <!-- Shortcut list: shared glass control -->
             <controls:ShortcutListControl Grid.Row="2"
                                           Categories="{Binding FilteredCategories}" />
-
-            <!-- Footer: glass action bar -->
-            <Border Grid.Row="3"
-                    Padding="12,8"
-                    BorderBrush="{DynamicResource CategoryDivider}"
-                    BorderThickness="0,0.5,0,0"
-                    CornerRadius="0,0,14,14">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0"
-                            Content="Edit"
-                            Style="{StaticResource FooterButton}"
-                            Margin="0,0,4,0" />
-
-                    <Button Grid.Column="1"
-                            Content="Settings"
-                            Command="{Binding OpenSettingsCommand}"
-                            Style="{StaticResource FooterButton}"
-                            Margin="4,0,0,0" />
-                </Grid>
-            </Border>
         </Grid>
     </Border>
 </Window>

@@ -3,18 +3,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ShortcutOverlay.Controls">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <ItemsControl ItemsSource="{Binding Categories, RelativeSource={RelativeSource AncestorType=local:ShortcutListControl}}"
-                      Margin="10,4,10,10">
+        <ItemsControl x:Name="CategoriesItemsControl"
+                      ItemsSource="{Binding Categories, RelativeSource={RelativeSource AncestorType=local:ShortcutListControl}}"
+                      Margin="8,2,8,8"
+                      AllowDrop="True"
+                      DragOver="Categories_DragOver"
+                      Drop="Categories_Drop">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,0,0,8">
-                        <!-- Category Header — Apple-style muted label -->
-                        <TextBlock Text="{Binding Name}"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource SecondaryText}"
-                                   Margin="4,8,4,6"
-                                   Effect="{StaticResource TextShadowLight}" />
+                    <StackPanel Margin="0,0,0,6">
+                        <!-- Category Header — drag handle + quiet section label -->
+                        <Grid Margin="2,6,4,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Drag grip — subtle, brighter on hover -->
+                            <TextBlock Grid.Column="0"
+                                       Text="⠿"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TertiaryText}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,4,0"
+                                       Cursor="SizeAll"
+                                       Opacity="0.35"
+                                       MouseLeftButtonDown="CategoryDragGrip_MouseDown">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.85"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <!-- Category name — quiet ALL CAPS label -->
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Name}"
+                                       FontSize="10"
+                                       FontWeight="Medium"
+                                       Foreground="{DynamicResource TertiaryText}"
+                                       FontFamily="SF Pro Text, Segoe UI, sans-serif"
+                                       VerticalAlignment="Center"
+                                       Typography.Capitals="AllSmallCaps"
+                                       Effect="{StaticResource TextShadowLight}" />
+                        </Grid>
 
                         <!-- Shortcuts — glass card group -->
                         <Border Background="{DynamicResource ShortcutRowBackground}"
@@ -25,27 +61,29 @@
                             <ItemsControl ItemsSource="{Binding Shortcuts}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Padding="10,8"
+                                        <Border Padding="8,5"
                                                 BorderBrush="{DynamicResource CategoryDivider}"
-                                                BorderThickness="0,0,0,1">
+                                                BorderThickness="0,0,0,0.5">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" MinWidth="110"/>
+                                                    <ColumnDefinition Width="Auto" MinWidth="100"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Key badges (left) -->
+                                                <!-- Key badges (left) — HERO element -->
                                                 <local:KeyComboDisplay Grid.Column="0"
                                                                        Keys="{Binding Keys}"
                                                                        VerticalAlignment="Center"
-                                                                       Margin="0,0,12,0"/>
+                                                                       Margin="0,0,10,0"/>
 
-                                                <!-- Description (right) -->
+                                                <!-- Description (right) — supporting role, smaller + dimmed -->
                                                 <TextBlock Grid.Column="1"
                                                            Text="{Binding Description}"
-                                                           FontSize="13"
+                                                           FontSize="11.5"
+                                                           FontWeight="Normal"
                                                            TextWrapping="Wrap"
-                                                           Foreground="{DynamicResource PrimaryText}"
+                                                           Foreground="{DynamicResource SecondaryText}"
+                                                           Opacity="0.85"
                                                            VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
@@ -54,6 +92,7 @@
                             </ItemsControl>
                         </Border>
                     </StackPanel>
+
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

@@ -1,6 +1,9 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
+using ShortcutOverlay.Helpers;
 using ShortcutOverlay.NativeInterop;
+using ShortcutOverlay.Services;
 using ShortcutOverlay.ViewModels;
 
 namespace ShortcutOverlay.Views;
@@ -88,5 +91,62 @@ public partial class TrayPopupWindow : Window, IOverlayMode
         {
             ShowOverlay();
         }
+    }
+
+    // ── Context menu handlers ──
+
+    private void MenuIcon_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (ContextMenu != null)
+        {
+            ContextMenu.PlacementTarget = sender as UIElement;
+            ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            ContextMenu.IsOpen = true;
+        }
+    }
+
+    private void ThemeMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag)
+        {
+            var settings = SettingsService.Instance;
+            string themeSetting = tag.Equals("Adaptive", StringComparison.OrdinalIgnoreCase)
+                ? $"adaptive:{ThemeManager.CurrentFamily}"
+                : tag;
+            var newSettings = settings.Current with { Theme = themeSetting };
+            settings.UpdateAsync(newSettings).ConfigureAwait(false);
+            ThemeManager.ApplyTheme(themeSetting);
+        }
+    }
+
+    private void OpacityMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag && double.TryParse(tag, out double opacity))
+        {
+            Opacity = opacity;
+            var settings = SettingsService.Instance;
+            var newSettings = settings.Current with { Opacity = opacity };
+            settings.UpdateAsync(newSettings).ConfigureAwait(false);
+        }
+    }
+
+    private void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item && item.Tag is string tag)
+        {
+            System.Diagnostics.Debug.WriteLine($"Display mode switch requested: {tag}");
+        }
+    }
+
+    private void About_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("ShortcutOverlay v1.0\nA minimalist keyboard shortcut overlay.",
+            "About", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void Quit_Click(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
     }
 }

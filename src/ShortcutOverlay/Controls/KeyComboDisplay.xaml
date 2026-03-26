@@ -9,16 +9,16 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <!-- Apple-style frosted pill badge -->
-                <Border Margin="0,0,3,0"
-                        Padding="7,3"
-                        CornerRadius="6"
+                <!-- Apple-style frosted pill badge — HERO element, prominent -->
+                <Border Margin="0,0,2,0"
+                        Padding="6,2"
+                        CornerRadius="5"
                         Background="{DynamicResource KeyBadgeBackground}"
                         BorderBrush="{DynamicResource KeyBadgeBorder}"
                         BorderThickness="0.5">
                     <TextBlock Text="{Binding}"
-                               FontSize="11"
-                               FontWeight="Medium"
+                               FontSize="12"
+                               FontWeight="SemiBold"
                                FontFamily="SF Pro Text, Segoe UI, sans-serif"
                                Foreground="{DynamicResource KeyBadgeText}"/>
                 </Border>

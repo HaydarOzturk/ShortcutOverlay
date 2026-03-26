@@ -13,6 +13,7 @@ public record ShortcutProfile
 public record ShortcutCategory
 {
     public string Name { get; init; } = string.Empty;
+    public int SortOrder { get; init; } = 0;
     public List<ShortcutEntry> Shortcuts { get; init; } = new();
 }
 
