@@ -10,7 +10,8 @@ namespace ShortcutOverlay.Views;
 public partial class FloatingWidgetWindow : Window, IOverlayMode
 {
     private bool _overlayVisible = true;
-    private readonly DispatcherTimer _adaptiveTimer;
+    private readonly DispatcherTimer _adaptiveDebounce;
+    private readonly DispatcherTimer _adaptivePollTimer;
 
     public bool IsOverlayVisible => _overlayVisible;
 
@@ -19,23 +20,35 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         InitializeComponent();
         DataContext = viewModel;
 
-        // Re-check brightness when the foreground app changes
+        // Re-check brightness when the foreground app changes (profile or app name)
         viewModel.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName == nameof(MainViewModel.CurrentProfile))
+            if (args.PropertyName == nameof(MainViewModel.CurrentProfile) ||
+                args.PropertyName == nameof(MainViewModel.CurrentAppName))
                 TriggerAdaptiveCheck();
         };
 
-        // Debounced timer — 500ms settle time before sampling
-        _adaptiveTimer = new DispatcherTimer
+        // Debounced timer — 400ms settle time before sampling on events
+        _adaptiveDebounce = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(500)
+            Interval = TimeSpan.FromMilliseconds(400)
         };
-        _adaptiveTimer.Tick += (_, _) =>
+        _adaptiveDebounce.Tick += (_, _) =>
         {
-            _adaptiveTimer.Stop();
+            _adaptiveDebounce.Stop();
             RunAdaptiveCheck();
         };
+
+        // Continuous polling timer — runs every 1.5s while adaptive mode is active.
+        // Catches cases the event-driven approach misses:
+        //   • foreground app changed but profile stayed null/same
+        //   • user scrolled content behind overlay (dark → light region)
+        //   • window was resized or moved behind overlay
+        _adaptivePollTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(1500)
+        };
+        _adaptivePollTimer.Tick += (_, _) => RunAdaptiveCheck();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -44,6 +57,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         ForceTopmost();
         HideFromAltTab();
         TriggerAdaptiveCheck();
+        StartAdaptivePolling();
     }
 
     private void ForceTopmost()
@@ -68,11 +82,29 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         TriggerAdaptiveCheck();
     }
 
+    /// <summary>
+    /// Triggers an immediate (debounced) adaptive check — used for event-driven
+    /// responses like app switch or drag-move.
+    /// </summary>
     private void TriggerAdaptiveCheck()
     {
         if (!ThemeManager.IsAdaptiveMode) return;
-        _adaptiveTimer.Stop();
-        _adaptiveTimer.Start();
+        _adaptiveDebounce.Stop();
+        _adaptiveDebounce.Start();
+    }
+
+    /// <summary>
+    /// Starts the continuous poll timer. Call once after window is shown.
+    /// </summary>
+    private void StartAdaptivePolling()
+    {
+        if (ThemeManager.IsAdaptiveMode && !_adaptivePollTimer.IsEnabled)
+            _adaptivePollTimer.Start();
+    }
+
+    private void StopAdaptivePolling()
+    {
+        _adaptivePollTimer.Stop();
     }
 
     /// <summary>
@@ -121,6 +153,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             Activate();
             _overlayVisible = true;
             TriggerAdaptiveCheck();
+            StartAdaptivePolling();
         }
     }
 
@@ -130,6 +163,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         {
             Hide();
             _overlayVisible = false;
+            StopAdaptivePolling();
         }
     }
 
