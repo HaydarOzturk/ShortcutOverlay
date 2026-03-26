@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Text;
 
 namespace ShortcutOverlay.Helpers;
 
@@ -135,12 +136,22 @@ public static class ThemeManager
 
     /// <summary>
     /// Gets the process name from a window handle.
+    /// Desktop windows (Progman/WorkerW) return "__desktop__" so they get
+    /// their own entry in the per-app brightness cache.
     /// </summary>
     private static string GetProcessName(IntPtr hwnd)
     {
         try
         {
             if (hwnd == IntPtr.Zero) return string.Empty;
+
+            // Check if this is the desktop window — return a special cache key
+            var className = new StringBuilder(256);
+            NativeInterop.Win32Api.GetClassName(hwnd, className, 256);
+            var cls = className.ToString();
+            if (cls == "Progman" || cls == "WorkerW")
+                return "__desktop__";
+
             NativeInterop.Win32Api.GetWindowThreadProcessId(hwnd, out var pid);
             if (pid == 0) return string.Empty;
             using var proc = Process.GetProcessById((int)pid);

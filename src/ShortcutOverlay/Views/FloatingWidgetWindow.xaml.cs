@@ -1,3 +1,4 @@
+using System.Text;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
@@ -140,9 +141,24 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
 
                 if (foregroundHwnd == IntPtr.Zero)
                 {
-                    AdaptiveDebugLog.Log("  SKIP — no window found below us");
-                    return;
+                    // No window below us — likely desktop is showing (all minimized).
+                    // Use the desktop window handle so we still sample the wallpaper.
+                    foregroundHwnd = FindDesktopWindow();
+                    AdaptiveDebugLog.Log($"  No window below, trying desktop=0x{foregroundHwnd:X}");
+
+                    if (foregroundHwnd == IntPtr.Zero)
+                    {
+                        AdaptiveDebugLog.Log("  SKIP — no window and no desktop found");
+                        return;
+                    }
                 }
+            }
+
+            // Also check if the foreground IS the desktop (Progman/WorkerW from explorer)
+            // This happens when user clicks on desktop or minimizes all windows
+            if (IsDesktopWindow(foregroundHwnd))
+            {
+                AdaptiveDebugLog.Log($"  Desktop detected (foreground=0x{foregroundHwnd:X})");
             }
 
             // Convert overlay position to physical screen pixels (DPI-aware)
@@ -168,6 +184,33 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         {
             AdaptiveDebugLog.Log($"  EXCEPTION: {ex.GetType().Name}: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Checks if a window handle belongs to the desktop shell (Progman or WorkerW).
+    /// </summary>
+    private static bool IsDesktopWindow(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero) return false;
+        var className = new StringBuilder(256);
+        Win32Api.GetClassName(hwnd, className, 256);
+        var cls = className.ToString();
+        return cls == "Progman" || cls == "WorkerW";
+    }
+
+    /// <summary>
+    /// Finds the desktop window (Progman). Used as fallback when no regular window is
+    /// below the overlay — i.e., all windows are minimized and only the wallpaper is visible.
+    /// </summary>
+    private static IntPtr FindDesktopWindow()
+    {
+        // Progman is the main desktop window that hosts the wallpaper
+        var progman = Win32Api.FindWindow("Progman", null);
+        if (progman != IntPtr.Zero) return progman;
+
+        // WorkerW is an alternative desktop host (used when wallpaper slideshow is active)
+        var workerW = Win32Api.FindWindow("WorkerW", null);
+        return workerW;
     }
 
     /// <summary>

@@ -170,6 +170,10 @@ public static class Win32Api
         public BITMAPINFOHEADER bmiHeader;
     }
 
+    // --- Desktop / Shell Window Detection ---
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
     // --- DWM (Mica/Acrylic) ---
     [DllImport("dwmapi.dll")]
     public static extern int DwmSetWindowAttribute(
