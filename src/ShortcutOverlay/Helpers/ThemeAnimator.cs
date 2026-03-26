@@ -1,19 +1,27 @@
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace ShortcutOverlay.Helpers;
 
 /// <summary>
-/// Owns a single set of mutable SolidColorBrush resources registered in Application.Resources.
-/// Smoothly animates between ThemePalettes using ColorAnimation — no ResourceDictionary swaps.
-/// This is the secret to seamless, invisible transitions.
+/// Owns theme color resources in Application.Resources.
+/// Smoothly transitions between ThemePalettes using manual timer-based interpolation.
+///
+/// WPF automatically FREEZES brushes added to Application.Resources, making
+/// ColorAnimation impossible (throws InvalidOperationException). Instead, we
+/// interpolate colors manually at 60fps using a DispatcherTimer and replace
+/// the frozen brush with a new one each frame. DynamicResource bindings in XAML
+/// automatically pick up the replacement, so this works seamlessly.
+///
+/// The visual result is identical to ColorAnimation: smooth 200ms transitions.
 /// </summary>
 public static class ThemeAnimator
 {
-    // Animation duration — 200ms with cubic ease feels Apple-like
-    private static readonly Duration AnimDuration = new(TimeSpan.FromMilliseconds(200));
-    private static readonly IEasingFunction Easing = new CubicEase { EasingMode = EasingMode.EaseInOut };
+    // Transition config
+    private const int TransitionMs = 200;
+    private const int FrameIntervalMs = 16; // ~60fps
+    private static readonly int TotalFrames = TransitionMs / FrameIntervalMs; // ~12 frames
 
     // All resource keys we manage
     private static readonly string[] BrushKeys =
@@ -32,8 +40,14 @@ public static class ThemeAnimator
     private static ThemePalette? _currentPalette;
     private static bool _initialized;
 
+    // Transition state
+    private static DispatcherTimer? _transitionTimer;
+    private static ThemePalette? _fromPalette;
+    private static ThemePalette? _toPalette;
+    private static int _currentFrame;
+
     /// <summary>
-    /// Creates mutable SolidColorBrush resources in Application.Resources.
+    /// Creates initial brush resources in Application.Resources.
     /// Must be called once at startup BEFORE any UI references DynamicResource keys.
     /// </summary>
     public static void Initialize(ThemePalette initialPalette)
@@ -41,52 +55,87 @@ public static class ThemeAnimator
         var res = Application.Current.Resources;
 
         // Remove any existing theme ResourceDictionary (index 1 from App.xaml)
-        // We'll replace it with direct brush entries
         var merged = res.MergedDictionaries;
         if (merged.Count > 1)
             merged.RemoveAt(1); // Remove the DarkTheme.xaml default
 
-        // Create mutable brushes with initial colors
+        // Create brushes with initial colors
         foreach (var key in BrushKeys)
         {
             var color = GetColor(initialPalette, key);
-            var brush = new SolidColorBrush(color);
-            // Do NOT freeze — we need to animate these
-            res[key] = brush;
+            res[key] = new SolidColorBrush(color);
         }
+
+        // Set up the transition timer (created once, started/stopped per transition)
+        _transitionTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(FrameIntervalMs)
+        };
+        _transitionTimer.Tick += OnTransitionFrame;
 
         _currentPalette = initialPalette;
         _initialized = true;
+
+        AdaptiveDebugLog.Log($"ThemeAnimator.Initialize: palette={initialPalette.Name}, {BrushKeys.Length} brushes created");
     }
 
     /// <summary>
-    /// Smoothly transitions all brush colors to the target palette.
-    /// If already at this palette, does nothing. Animation is ~200ms.
+    /// Smoothly transitions all brush colors to the target palette over ~200ms.
+    /// Uses manual frame-by-frame interpolation (not ColorAnimation).
     /// </summary>
     public static void TransitionTo(ThemePalette target)
     {
         if (!_initialized) return;
         if (_currentPalette?.Name == target.Name) return;
 
-        var res = Application.Current.Resources;
+        // Stop any in-progress transition
+        _transitionTimer?.Stop();
 
-        foreach (var key in BrushKeys)
+        _fromPalette = _currentPalette;
+        _toPalette = target;
+        _currentFrame = 0;
+        _currentPalette = target;
+
+        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: {_fromPalette?.Name} → {target.Name}");
+
+        // Start interpolating
+        _transitionTimer?.Start();
+    }
+
+    /// <summary>
+    /// Called ~60 times per second during a transition. Interpolates colors and
+    /// replaces the brush resources. DynamicResource bindings update automatically.
+    /// </summary>
+    private static void OnTransitionFrame(object? sender, EventArgs e)
+    {
+        if (_fromPalette == null || _toPalette == null || _transitionTimer == null)
         {
-            if (res[key] is SolidColorBrush brush)
-            {
-                var toColor = GetColor(target, key);
-                var anim = new ColorAnimation
-                {
-                    To = toColor,
-                    Duration = AnimDuration,
-                    EasingFunction = Easing,
-                    FillBehavior = FillBehavior.HoldEnd,
-                };
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
-            }
+            _transitionTimer?.Stop();
+            return;
         }
 
-        _currentPalette = target;
+        _currentFrame++;
+        double t = Math.Min(1.0, (double)_currentFrame / TotalFrames);
+
+        // Apply cubic ease-in-out for smooth acceleration/deceleration
+        double eased = CubicEaseInOut(t);
+
+        var res = Application.Current.Resources;
+        foreach (var key in BrushKeys)
+        {
+            var fromColor = GetColor(_fromPalette, key);
+            var toColor = GetColor(_toPalette, key);
+            var current = LerpColor(fromColor, toColor, eased);
+            res[key] = new SolidColorBrush(current);
+        }
+
+        // Done?
+        if (t >= 1.0)
+        {
+            _transitionTimer.Stop();
+            _fromPalette = null;
+            AdaptiveDebugLog.Log($"ThemeAnimator: Transition complete ({_currentFrame} frames)");
+        }
     }
 
     /// <summary>
@@ -95,24 +144,41 @@ public static class ThemeAnimator
     public static void SetImmediate(ThemePalette target)
     {
         if (!_initialized) return;
-        var res = Application.Current.Resources;
+        _transitionTimer?.Stop();
 
+        var res = Application.Current.Resources;
         foreach (var key in BrushKeys)
         {
-            if (res[key] is SolidColorBrush brush)
-            {
-                // Remove any running animation first
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, null);
-                brush.Color = GetColor(target, key);
-            }
+            res[key] = new SolidColorBrush(GetColor(target, key));
         }
 
         _currentPalette = target;
     }
 
     /// <summary>
+    /// Linear interpolation between two colors.
+    /// </summary>
+    private static Color LerpColor(Color a, Color b, double t)
+    {
+        return Color.FromArgb(
+            (byte)(a.A + (b.A - a.A) * t),
+            (byte)(a.R + (b.R - a.R) * t),
+            (byte)(a.G + (b.G - a.G) * t),
+            (byte)(a.B + (b.B - a.B) * t));
+    }
+
+    /// <summary>
+    /// Cubic ease-in-out: smooth start + smooth end.
+    /// </summary>
+    private static double CubicEaseInOut(double t)
+    {
+        return t < 0.5
+            ? 4 * t * t * t
+            : 1 - Math.Pow(-2 * t + 2, 3) / 2;
+    }
+
+    /// <summary>
     /// Extracts a Color from a ThemePalette by resource key name.
-    /// Uses reflection-free switch for performance.
     /// </summary>
     private static Color GetColor(ThemePalette p, string key) => key switch
     {
