@@ -31,10 +31,10 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             }
         };
 
-        // Debounced timer — 400ms settle time before sampling on events
+        // Debounced timer — 150ms settle before sampling (fast enough to feel instant)
         _adaptiveDebounce = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(400)
+            Interval = TimeSpan.FromMilliseconds(150)
         };
         _adaptiveDebounce.Tick += (_, _) =>
         {

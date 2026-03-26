@@ -4,202 +4,82 @@ using ShortcutOverlay.NativeInterop;
 namespace ShortcutOverlay.Helpers;
 
 /// <summary>
-/// Production-quality background brightness detector.
+/// Background brightness detector that samples the screen area AROUND the overlay.
 ///
-/// Strategy: Captures a region of the foreground window's SCREEN AREA that does NOT
-/// overlap with our overlay, using BitBlt from the desktop DC. This approach:
-///   1. Works with GPU-rendered windows (Electron, Chrome, UWP, games)
-///   2. Avoids capturing our own overlay pixels (self-sampling problem)
-///   3. Is fast (~1-3ms per capture) via GetDIBits bulk pixel read
+/// Strategy: Sample 4 strips immediately adjacent to the overlay (left, right, above, below).
+/// This tells us exactly what's visible behind the overlay, not some distant region of the
+/// foreground window. Handles mixed backgrounds (e.g., Claude light sidebar + terminal dark)
+/// by weighting the strips closest to the overlay center.
 ///
-/// Uses hysteresis to prevent rapid toggling near the brightness threshold.
+/// Also returns brightness variance — high variance means mixed content (text on background),
+/// which the overlay can use to boost opacity for better readability.
 /// </summary>
 public static class ScreenBrightnessDetector
 {
-    // Hysteresis thresholds — wide dead zone prevents flickering
+    // Hysteresis thresholds
     private const double UpperThreshold = 0.58;
     private const double LowerThreshold = 0.42;
 
-    // Size of the sample area (pixels). 200x200 = 400 samples at step=10.
-    private const int SampleSize = 200;
+    // Strip width for sampling around overlay edges
+    private const int StripSize = 60;
 
     private static bool? _lastDecisionIsLight;
 
+    // Exposed for readability adjustments
+    public static double LastBrightnessVariance { get; private set; }
+    public static double LastBrightness { get; private set; }
+
     /// <summary>
-    /// Detects whether the background behind the overlay is light or dark.
-    /// Samples the foreground window's visible screen area, avoiding the overlay region.
+    /// Detects whether the background directly around the overlay is light or dark.
+    /// Samples the screen strips immediately adjacent to the overlay boundaries.
     /// </summary>
     public static bool IsBackgroundLight(IntPtr foregroundHwnd,
         int overlayScreenX, int overlayScreenY, int overlayW, int overlayH)
     {
-        if (foregroundHwnd == IntPtr.Zero)
-        {
-            AdaptiveDebugLog.Log("Brightness: foregroundHwnd is Zero, returning 0.5");
-            return ApplyHysteresis(0.5);
-        }
+        // Sample strips around the overlay — this captures what's ACTUALLY behind it
+        var (brightness, variance) = SampleAroundOverlay(
+            overlayScreenX, overlayScreenY, overlayW, overlayH);
 
-        // Get the foreground window's screen rect
-        if (!Win32Api.GetWindowRect(foregroundHwnd, out var winRect))
-        {
-            AdaptiveDebugLog.Log("Brightness: GetWindowRect failed");
-            return ApplyHysteresis(0.5);
-        }
+        LastBrightness = brightness;
+        LastBrightnessVariance = variance;
 
-        int winW = winRect.Width;
-        int winH = winRect.Height;
-        AdaptiveDebugLog.Log($"Brightness: winRect=({winRect.Left},{winRect.Top},{winW}x{winH}), overlay=({overlayScreenX},{overlayScreenY},{overlayW}x{overlayH})");
-
-        if (winW <= 0 || winH <= 0)
-        {
-            AdaptiveDebugLog.Log("Brightness: window has zero size");
-            return ApplyHysteresis(0.5);
-        }
-
-        // Find a sample region within the foreground window that does NOT
-        // overlap with our overlay
-        var sampleRect = FindNonOverlappingSampleRegion(
-            winRect, overlayScreenX, overlayScreenY, overlayW, overlayH);
-
-        if (sampleRect.w <= 0 || sampleRect.h <= 0)
-        {
-            AdaptiveDebugLog.Log("Brightness: no non-overlapping region found, using strip fallback");
-            double fallback = GetBrightnessViaScreenStrips(
-                overlayScreenX, overlayScreenY, overlayW, overlayH);
-            AdaptiveDebugLog.Log($"Brightness: strip fallback={fallback:F3}");
-            return ApplyHysteresis(fallback);
-        }
-
-        // Capture that region from the SCREEN via BitBlt
-        double brightness = CaptureAndAnalyzeScreenRegion(
-            sampleRect.x, sampleRect.y, sampleRect.w, sampleRect.h);
-
-        AdaptiveDebugLog.Log($"Brightness: sample=({sampleRect.x},{sampleRect.y},{sampleRect.w}x{sampleRect.h}) brightness={brightness:F3}");
-
-        if (brightness < 0)
-        {
-            AdaptiveDebugLog.Log("Brightness: BitBlt failed, using strip fallback");
-            brightness = GetBrightnessViaScreenStrips(
-                overlayScreenX, overlayScreenY, overlayW, overlayH);
-        }
+        AdaptiveDebugLog.Log($"Brightness: local={brightness:F3}, variance={variance:F3}");
 
         return ApplyHysteresis(brightness);
     }
 
     /// <summary>
-    /// Finds a SampleSize x SampleSize region within the foreground window's screen rect
-    /// that does NOT overlap with the overlay.
+    /// Samples 4 strips immediately adjacent to the overlay and returns
+    /// average brightness + variance. The strips sample what's visible on screen
+    /// right next to where the overlay sits.
     /// </summary>
-    private static (int x, int y, int w, int h) FindNonOverlappingSampleRegion(
-        Win32Api.RECT winRect, int oX, int oY, int oW, int oH)
+    private static (double brightness, double variance) SampleAroundOverlay(
+        int oX, int oY, int oW, int oH)
     {
-        int sw = Math.Min(SampleSize, winRect.Width);
-        int sh = Math.Min(SampleSize, winRect.Height);
-
-        // Candidate sample positions
-        var candidates = new (int x, int y)[]
-        {
-            // Center of the foreground window
-            (winRect.Left + (winRect.Width - sw) / 2, winRect.Top + (winRect.Height - sh) / 2),
-            // Top-left quarter
-            (winRect.Left + winRect.Width / 4 - sw / 2, winRect.Top + winRect.Height / 4 - sh / 2),
-            // Top-right quarter
-            (winRect.Left + 3 * winRect.Width / 4 - sw / 2, winRect.Top + winRect.Height / 4 - sh / 2),
-            // Bottom-left quarter
-            (winRect.Left + winRect.Width / 4 - sw / 2, winRect.Top + 3 * winRect.Height / 4 - sh / 2),
-            // Bottom-right quarter
-            (winRect.Left + 3 * winRect.Width / 4 - sw / 2, winRect.Top + 3 * winRect.Height / 4 - sh / 2),
-            // Far left edge
-            (winRect.Left + 20, winRect.Top + winRect.Height / 2 - sh / 2),
-            // Far right edge
-            (winRect.Right - sw - 20, winRect.Top + winRect.Height / 2 - sh / 2),
-        };
-
-        foreach (var (cx, cy) in candidates)
-        {
-            int sx = Math.Max(winRect.Left, Math.Min(cx, winRect.Right - sw));
-            int sy = Math.Max(winRect.Top, Math.Min(cy, winRect.Bottom - sh));
-
-            if (!RectsOverlap(sx, sy, sw, sh, oX, oY, oW, oH))
-                return (sx, sy, sw, sh);
-        }
-
-        // All candidates overlap — try strips
-        if (oY - winRect.Top > 50)
-        {
-            int stripH = Math.Min(50, oY - winRect.Top);
-            return (winRect.Left + 20, oY - stripH, Math.Min(winRect.Width - 40, 400), stripH);
-        }
-        if (winRect.Bottom - (oY + oH) > 50)
-        {
-            int stripH = Math.Min(50, winRect.Bottom - (oY + oH));
-            return (winRect.Left + 20, oY + oH, Math.Min(winRect.Width - 40, 400), stripH);
-        }
-        if (oX - winRect.Left > 50)
-        {
-            int stripW = Math.Min(50, oX - winRect.Left);
-            return (winRect.Left + 10, winRect.Top + 50, stripW, Math.Min(winRect.Height - 100, 400));
-        }
-
-        return (0, 0, 0, 0);
-    }
-
-    private static bool RectsOverlap(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh)
-    {
-        return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
-    }
-
-    /// <summary>
-    /// Captures a screen region via BitBlt and analyzes its brightness.
-    /// Returns brightness 0..1, or -1 on failure.
-    /// </summary>
-    private static double CaptureAndAnalyzeScreenRegion(int x, int y, int w, int h)
-    {
-        if (w <= 0 || h <= 0) return -1;
-
         var hdcScreen = Win32Api.GetDC(IntPtr.Zero);
-        if (hdcScreen == IntPtr.Zero) return -1;
+        if (hdcScreen == IntPtr.Zero) return (0.5, 0);
 
-        var hdcMem = Win32Api.CreateCompatibleDC(hdcScreen);
-        var hBitmap = Win32Api.CreateCompatibleBitmap(hdcScreen, w, h);
-        var hOld = Win32Api.SelectObject(hdcMem, hBitmap);
-
-        Win32Api.BitBlt(hdcMem, 0, 0, w, h, hdcScreen, x, y, Win32Api.SRCCOPY);
-        Win32Api.ReleaseDC(IntPtr.Zero, hdcScreen);
-
-        double brightness = AnalyzeRegionFromDC(hdcMem, hBitmap, 0, 0, w, h);
-
-        Win32Api.SelectObject(hdcMem, hOld);
-        Win32Api.DeleteObject(hBitmap);
-        Win32Api.DeleteDC(hdcMem);
-
-        return brightness;
-    }
-
-    /// <summary>
-    /// Fallback: samples thin strips around overlay edges from the screen.
-    /// </summary>
-    private static double GetBrightnessViaScreenStrips(
-        int overlayX, int overlayY, int overlayW, int overlayH)
-    {
-        const int stripW = 40;
-
-        var hdcScreen = Win32Api.GetDC(IntPtr.Zero);
-        if (hdcScreen == IntPtr.Zero) return 0.5;
-
+        // Four strips surrounding the overlay:
+        //   [  above  ]
+        //   [L]      [R]
+        //   [  below  ]
         var strips = new (int x, int y, int w, int h)[]
         {
-            (Math.Max(0, overlayX - stripW), overlayY, stripW, overlayH),
-            (overlayX + overlayW, overlayY, stripW, overlayH),
-            (overlayX, Math.Max(0, overlayY - stripW), overlayW, stripW),
-            (overlayX, overlayY + overlayH, overlayW, stripW),
+            // Left strip — right next to overlay's left edge
+            (Math.Max(0, oX - StripSize), oY, Math.Min(StripSize, oX), oH),
+            // Right strip — right next to overlay's right edge
+            (oX + oW, oY, StripSize, oH),
+            // Above strip — right above overlay
+            (oX, Math.Max(0, oY - StripSize), oW, Math.Min(StripSize, oY)),
+            // Below strip — right below overlay
+            (oX, oY + oH, oW, StripSize),
         };
 
-        double totalLum = 0;
-        long totalSamples = 0;
+        var stripBrightnesses = new List<double>();
 
         foreach (var (sx, sy, sw, sh) in strips)
         {
-            if (sw <= 0 || sh <= 0) continue;
+            if (sw <= 5 || sh <= 5) continue; // Skip degenerate strips
 
             var hdcMem = Win32Api.CreateCompatibleDC(hdcScreen);
             var hBmp = Win32Api.CreateCompatibleBitmap(hdcScreen, sw, sh);
@@ -207,12 +87,9 @@ public static class ScreenBrightnessDetector
 
             Win32Api.BitBlt(hdcMem, 0, 0, sw, sh, hdcScreen, sx, sy, Win32Api.SRCCOPY);
 
-            double stripBrightness = AnalyzeRegionFromDC(hdcMem, hBmp, 0, 0, sw, sh);
-            if (stripBrightness >= 0)
-            {
-                totalLum += stripBrightness;
-                totalSamples++;
-            }
+            double stripB = AnalyzeRegionFromDC(hdcMem, hBmp, 0, 0, sw, sh);
+            if (stripB >= 0)
+                stripBrightnesses.Add(stripB);
 
             Win32Api.SelectObject(hdcMem, hOldBmp);
             Win32Api.DeleteObject(hBmp);
@@ -220,12 +97,27 @@ public static class ScreenBrightnessDetector
         }
 
         Win32Api.ReleaseDC(IntPtr.Zero, hdcScreen);
-        return totalSamples > 0 ? totalLum / totalSamples : 0.5;
+
+        if (stripBrightnesses.Count == 0)
+            return (0.5, 0);
+
+        // Calculate weighted average (side strips weighted more — they're larger)
+        double avg = 0;
+        foreach (var b in stripBrightnesses) avg += b;
+        avg /= stripBrightnesses.Count;
+
+        // Calculate variance — high variance = mixed content (text, split background)
+        double variance = 0;
+        foreach (var b in stripBrightnesses)
+            variance += (b - avg) * (b - avg);
+        variance /= stripBrightnesses.Count;
+
+        return (avg, variance);
     }
 
     /// <summary>
     /// Fast pixel analysis using GetDIBits. Returns average perceived brightness (0..1).
-    /// Returns -1 on failure. Samples every 10th pixel.
+    /// Returns -1 on failure. Samples every 8th pixel.
     /// </summary>
     private static double AnalyzeRegionFromDC(IntPtr hdcMem, IntPtr hBitmap,
         int regionX, int regionY, int regionW, int regionH)
@@ -242,10 +134,10 @@ public static class ScreenBrightnessDetector
         if (fullW <= 0 || fullH <= 0) return -1;
 
         bmi.bmiHeader.biWidth = fullW;
-        bmi.bmiHeader.biHeight = -fullH; // Negative = top-down
+        bmi.bmiHeader.biHeight = -fullH;
         bmi.bmiHeader.biPlanes = 1;
         bmi.bmiHeader.biBitCount = 32;
-        bmi.bmiHeader.biCompression = 0; // BI_RGB
+        bmi.bmiHeader.biCompression = 0;
 
         int bufferSize = fullW * fullH * 4;
         var buffer = Marshal.AllocHGlobal(bufferSize);
@@ -258,7 +150,7 @@ public static class ScreenBrightnessDetector
 
             double totalLum = 0;
             int sampleCount = 0;
-            int step = 10;
+            int step = 8; // Sample every 8th pixel for speed
 
             unsafe
             {

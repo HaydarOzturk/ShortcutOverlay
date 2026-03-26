@@ -19,9 +19,10 @@ namespace ShortcutOverlay.Helpers;
 public static class ThemeAnimator
 {
     // Transition config
-    private const int TransitionMs = 200;
-    private const int FrameIntervalMs = 16; // ~60fps
-    private static readonly int TotalFrames = TransitionMs / FrameIntervalMs; // ~12 frames
+    private const int NormalTransitionMs = 200;
+    private const int FastTransitionMs = 80;   // For adaptive mode — snappier
+    private const int FrameIntervalMs = 16;    // ~60fps
+    private static int _totalFrames = NormalTransitionMs / FrameIntervalMs;
 
     // All resource keys we manage
     private static readonly string[] BrushKeys =
@@ -81,24 +82,35 @@ public static class ThemeAnimator
 
     /// <summary>
     /// Smoothly transitions all brush colors to the target palette over ~200ms.
-    /// Uses manual frame-by-frame interpolation (not ColorAnimation).
     /// </summary>
     public static void TransitionTo(ThemePalette target)
+    {
+        StartTransition(target, NormalTransitionMs);
+    }
+
+    /// <summary>
+    /// Fast transition (~80ms) for adaptive mode — snappy but not jarring.
+    /// </summary>
+    public static void TransitionFast(ThemePalette target)
+    {
+        StartTransition(target, FastTransitionMs);
+    }
+
+    private static void StartTransition(ThemePalette target, int durationMs)
     {
         if (!_initialized) return;
         if (_currentPalette?.Name == target.Name) return;
 
-        // Stop any in-progress transition
         _transitionTimer?.Stop();
 
         _fromPalette = _currentPalette;
         _toPalette = target;
         _currentFrame = 0;
+        _totalFrames = Math.Max(1, durationMs / FrameIntervalMs);
         _currentPalette = target;
 
-        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: {_fromPalette?.Name} → {target.Name}");
+        AdaptiveDebugLog.Log($"ThemeAnimator.TransitionTo: {_fromPalette?.Name} → {target.Name} ({durationMs}ms, {_totalFrames} frames)");
 
-        // Start interpolating
         _transitionTimer?.Start();
     }
 
@@ -115,7 +127,7 @@ public static class ThemeAnimator
         }
 
         _currentFrame++;
-        double t = Math.Min(1.0, (double)_currentFrame / TotalFrames);
+        double t = Math.Min(1.0, (double)_currentFrame / _totalFrames);
 
         // Apply cubic ease-in-out for smooth acceleration/deceleration
         double eased = CubicEaseInOut(t);
@@ -139,7 +151,7 @@ public static class ThemeAnimator
     }
 
     /// <summary>
-    /// Instantly sets all brush colors with no animation (for initial load).
+    /// Instantly sets all brush colors with no animation (for cached app switches).
     /// </summary>
     public static void SetImmediate(ThemePalette target)
     {
@@ -153,6 +165,34 @@ public static class ThemeAnimator
         }
 
         _currentPalette = target;
+    }
+
+    /// <summary>
+    /// Boosts overlay background opacity when background content is mixed (high variance).
+    /// This improves readability when the overlay sits over text or split-tone content.
+    /// </summary>
+    public static void AdjustForReadability(double variance)
+    {
+        if (!_initialized) return;
+
+        // variance > 0.02 means moderately mixed, > 0.05 means very mixed
+        if (variance < 0.015) return; // Background is uniform — no boost needed
+
+        var res = Application.Current.Resources;
+        if (res["OverlayBackground"] is SolidColorBrush currentBrush)
+        {
+            var c = currentBrush.Color;
+            // Boost alpha: map variance 0.015..0.08 → alpha increase of 0..80
+            double boost = Math.Min(80, (variance - 0.015) / 0.065 * 80);
+            byte newAlpha = (byte)Math.Min(255, c.A + boost);
+
+            if (newAlpha != c.A)
+            {
+                res["OverlayBackground"] = new SolidColorBrush(
+                    Color.FromArgb(newAlpha, c.R, c.G, c.B));
+                AdaptiveDebugLog.Log($"Readability boost: variance={variance:F3}, alpha {c.A}→{newAlpha}");
+            }
+        }
     }
 
     /// <summary>
