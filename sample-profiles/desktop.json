@@ -1,0 +1,46 @@
+{
+  "profileId": "desktop",
+  "displayName": "Windows Desktop",
+  "processNames": ["explorer"],
+  "windowClasses": ["Progman", "WorkerW"],
+  "icon": "desktop.png",
+  "categories": [
+    {
+      "name": "Window Management",
+      "shortcuts": [
+        { "keys": "Win+D", "description": "Show/hide desktop", "tags": ["desktop", "toggle"] },
+        { "keys": "Win+Tab", "description": "Task View (virtual desktops)", "tags": ["taskview", "virtual"] },
+        { "keys": "Win+Ctrl+D", "description": "Create new virtual desktop", "tags": ["virtual", "new"] },
+        { "keys": "Win+Ctrl+Left/Right", "description": "Switch between virtual desktops", "tags": ["virtual", "switch"] },
+        { "keys": "Win+Ctrl+F4", "description": "Close current virtual desktop", "tags": ["virtual", "close"] },
+        { "keys": "Alt+Tab", "description": "Switch between open windows", "tags": ["switch", "window"] },
+        { "keys": "Win+Left/Right", "description": "Snap window to half screen", "tags": ["snap", "split"] },
+        { "keys": "Win+Up", "description": "Maximize window", "tags": ["maximize"] },
+        { "keys": "Win+Down", "description": "Minimize / restore window", "tags": ["minimize", "restore"] },
+        { "keys": "Win+Shift+Left/Right", "description": "Move window to another monitor", "tags": ["monitor", "move"] }
+      ]
+    },
+    {
+      "name": "System",
+      "shortcuts": [
+        { "keys": "Win+I", "description": "Open Settings", "tags": ["settings"] },
+        { "keys": "Win+E", "description": "Open File Explorer", "tags": ["explorer", "files"] },
+        { "keys": "Win+L", "description": "Lock your PC", "tags": ["lock", "security"] },
+        { "keys": "Win+X", "description": "Quick Link menu (Power User)", "tags": ["power", "menu"] },
+        { "keys": "Ctrl+Shift+Esc", "description": "Open Task Manager", "tags": ["task", "manager"] },
+        { "keys": "Win+R", "description": "Open Run dialog", "tags": ["run", "command"] },
+        { "keys": "Win+V", "description": "Open Clipboard history", "tags": ["clipboard", "history"] },
+        { "keys": "Win+Period", "description": "Emoji & symbol picker", "tags": ["emoji", "symbols"] }
+      ]
+    },
+    {
+      "name": "Screenshots & Recording",
+      "shortcuts": [
+        { "keys": "Win+Shift+S", "description": "Snipping Tool (screen capture)", "tags": ["screenshot", "snip"] },
+        { "keys": "PrtSc", "description": "Screenshot to clipboard", "tags": ["screenshot"] },
+        { "keys": "Win+Alt+R", "description": "Start/stop screen recording (Game Bar)", "tags": ["record", "video"] },
+        { "keys": "Win+G", "description": "Open Game Bar overlay", "tags": ["gamebar"] }
+      ]
+    }
+  ]
+}

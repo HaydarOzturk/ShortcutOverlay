@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="OverlayBackground" Color="#F0F0F0F0"/>
+    <SolidColorBrush x:Key="OverlayBorder" Color="#20000000"/>
+    <SolidColorBrush x:Key="HeaderBackground" Color="#08000000"/>
+    <SolidColorBrush x:Key="PrimaryText" Color="#FF1A1A1A"/>
+    <SolidColorBrush x:Key="SecondaryText" Color="#FF666666"/>
+    <SolidColorBrush x:Key="KeyBadgeBackground" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="KeyBadgeBorder" Color="#FFD0D0D0"/>
+    <SolidColorBrush x:Key="KeyBadgeText" Color="#FF333333"/>
+    <SolidColorBrush x:Key="SearchBackground" Color="#10000000"/>
+    <SolidColorBrush x:Key="SearchText" Color="#FF1A1A1A"/>
+    <SolidColorBrush x:Key="SearchPlaceholder" Color="#FF999999"/>
+</ResourceDictionary>

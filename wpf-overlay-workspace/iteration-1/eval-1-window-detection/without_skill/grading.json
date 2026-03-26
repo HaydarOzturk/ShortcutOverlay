@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "Uses SetWinEventHook (event-driven) rather than polling with a timer",
+      "passed": false,
+      "evidence": "Uses GetForegroundWindow() in polling model with WindowChangeMonitor.CheckForWindowChange() (lines 336-346)"
+    },
+    {
+      "text": "Stores the WinEventDelegate as a class field to prevent garbage collection",
+      "passed": false,
+      "evidence": "No WinEventDelegate used; polling-based approach with no hook delegates"
+    },
+    {
+      "text": "Handles Desktop detection by checking for Progman/WorkerW window classes",
+      "passed": true,
+      "evidence": "Lines 162-165: IsDesktopWindow checks className == \"WorkerW\" or className == \"Progman\""
+    },
+    {
+      "text": "Handles File Explorer separately from Desktop (CabinetWClass)",
+      "passed": true,
+      "evidence": "Lines 216-228: IsFileExplorer checks ProcessName == 'explorer' and verifies ClassName != 'WorkerW' and != 'Progman'"
+    },
+    {
+      "text": "Detects UWP apps by enumerating child processes of ApplicationFrameHost",
+      "passed": false,
+      "evidence": "Lines 233-274: IsUwpApp uses heuristics (ApplicationFrameWindow class, CoreWindow, WindowsApps path, parent window check) but not child process enumeration"
+    },
+    {
+      "text": "Detects Windows Terminal shell type (cmd/powershell/bash) from window title",
+      "passed": false,
+      "evidence": "Lines 175-195: IsWindowsTerminal detects Windows Terminal but returns ApplicationType enum; no shell type detection from title"
+    },
+    {
+      "text": "Implements IDisposable and calls UnhookWinEvent in Dispose",
+      "passed": false,
+      "evidence": "WindowDetectionService is not IDisposable (line 13); no Dispose or UnhookWinEvent present"
+    },
+    {
+      "text": "P/Invoke declarations are in a separate class or reference Win32Api class",
+      "passed": false,
+      "evidence": "Lines 15-43: All P/Invoke declarations are inline in the WindowDetectionService class, not in a separate class"
+    }
+  ],
+  "overall_pass_rate": 0.25
+}

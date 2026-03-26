@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "window-detection-service",
+  "prompt": "Write me the WindowDetectionService class that hooks into Windows to detect which application is currently in the foreground. It needs to handle Desktop, File Explorer, UWP apps, and Windows Terminal specially.",
+  "assertions": [
+    {"text": "Uses SetWinEventHook (event-driven) rather than polling with a timer", "type": "required"},
+    {"text": "Stores the WinEventDelegate as a class field to prevent garbage collection", "type": "required"},
+    {"text": "Handles Desktop detection by checking for Progman/WorkerW window classes", "type": "required"},
+    {"text": "Handles File Explorer separately from Desktop (CabinetWClass)", "type": "required"},
+    {"text": "Detects UWP apps by enumerating child processes of ApplicationFrameHost", "type": "required"},
+    {"text": "Detects Windows Terminal shell type (cmd/powershell/bash) from window title", "type": "required"},
+    {"text": "Implements IDisposable and calls UnhookWinEvent in Dispose", "type": "required"},
+    {"text": "P/Invoke declarations are in a separate class or reference Win32Api class", "type": "preferred"}
+  ]
+}

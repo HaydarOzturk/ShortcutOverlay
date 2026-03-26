@@ -1,0 +1,57 @@
+{
+  "profileId": "chrome",
+  "displayName": "Google Chrome",
+  "processNames": ["chrome"],
+  "icon": "chrome.png",
+  "categories": [
+    {
+      "name": "Tabs & Windows",
+      "shortcuts": [
+        { "keys": "Ctrl+T", "description": "Open new tab", "tags": ["tab", "new"] },
+        { "keys": "Ctrl+W", "description": "Close current tab", "tags": ["tab", "close"] },
+        { "keys": "Ctrl+Shift+T", "description": "Reopen last closed tab", "tags": ["tab", "reopen"] },
+        { "keys": "Ctrl+Tab", "description": "Switch to next tab", "tags": ["tab", "switch"] },
+        { "keys": "Ctrl+Shift+Tab", "description": "Switch to previous tab", "tags": ["tab", "switch"] },
+        { "keys": "Ctrl+1...8", "description": "Go to specific tab (by number)", "tags": ["tab", "jump"] },
+        { "keys": "Ctrl+9", "description": "Go to last tab", "tags": ["tab", "last"] },
+        { "keys": "Ctrl+N", "description": "Open new window", "tags": ["window", "new"] },
+        { "keys": "Ctrl+Shift+N", "description": "Open new incognito window", "tags": ["incognito"] }
+      ]
+    },
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Ctrl+L", "description": "Focus address bar", "tags": ["url", "address"] },
+        { "keys": "Alt+Left", "description": "Go back", "tags": ["back", "history"] },
+        { "keys": "Alt+Right", "description": "Go forward", "tags": ["forward", "history"] },
+        { "keys": "Ctrl+R", "description": "Reload page", "tags": ["reload", "refresh"] },
+        { "keys": "Ctrl+Shift+R", "description": "Hard reload (clear cache)", "tags": ["reload", "cache"] },
+        { "keys": "F5", "description": "Reload page", "tags": ["reload"] },
+        { "keys": "Ctrl+H", "description": "Open history", "tags": ["history"] },
+        { "keys": "Ctrl+J", "description": "Open downloads", "tags": ["downloads"] }
+      ]
+    },
+    {
+      "name": "Page Actions",
+      "shortcuts": [
+        { "keys": "Ctrl+F", "description": "Find on page", "tags": ["find", "search"] },
+        { "keys": "Ctrl+G", "description": "Find next match", "tags": ["find", "next"] },
+        { "keys": "Ctrl+D", "description": "Bookmark current page", "tags": ["bookmark"] },
+        { "keys": "Ctrl+P", "description": "Print page", "tags": ["print"] },
+        { "keys": "Ctrl+S", "description": "Save page", "tags": ["save"] },
+        { "keys": "Ctrl+U", "description": "View page source", "tags": ["source", "html"] },
+        { "keys": "Ctrl+Plus/Minus", "description": "Zoom in/out", "tags": ["zoom"] },
+        { "keys": "Ctrl+0", "description": "Reset zoom to 100%", "tags": ["zoom", "reset"] }
+      ]
+    },
+    {
+      "name": "Developer",
+      "shortcuts": [
+        { "keys": "F12", "description": "Open DevTools", "tags": ["devtools", "inspect"] },
+        { "keys": "Ctrl+Shift+I", "description": "Open DevTools", "tags": ["devtools"] },
+        { "keys": "Ctrl+Shift+J", "description": "Open Console panel", "tags": ["console", "devtools"] },
+        { "keys": "Ctrl+Shift+C", "description": "Inspect element mode", "tags": ["inspect", "element"] }
+      ]
+    }
+  ]
+}

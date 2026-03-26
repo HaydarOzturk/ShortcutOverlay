@@ -1,0 +1,62 @@
+<Window x:Class="ShortcutOverlay.Views.FloatingWidgetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ShortcutOverlay.Controls"
+        Title="ShortcutOverlay"
+        Width="320" Height="450"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <Border CornerRadius="12"
+            Background="{DynamicResource OverlayBackground}"
+            BorderBrush="{DynamicResource OverlayBorder}"
+            BorderThickness="1"
+            Effect="{StaticResource DropShadowEffect}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>  <!-- Header -->
+                <RowDefinition Height="Auto"/>  <!-- Search -->
+                <RowDefinition Height="*"/>     <!-- Shortcut list -->
+                <RowDefinition Height="Auto"/>  <!-- Footer -->
+            </Grid.RowDefinitions>
+
+            <!-- Header: App name + dropdown -->
+            <Border Grid.Row="0" Padding="12,8"
+                    Background="{DynamicResource HeaderBackground}"
+                    CornerRadius="12,12,0,0">
+                <DockPanel>
+                    <TextBlock Text="{Binding CurrentAppName}"
+                               FontWeight="SemiBold" FontSize="14"
+                               Foreground="{DynamicResource PrimaryText}"
+                               VerticalAlignment="Center"/>
+                    <ComboBox DockPanel.Dock="Right" HorizontalAlignment="Right"
+                              ItemsSource="{Binding AllProfiles}"
+                              DisplayMemberPath="DisplayName"
+                              Width="30" Opacity="0.6"/>
+                </DockPanel>
+            </Border>
+
+            <!-- Search bar -->
+            <controls:SearchBox Grid.Row="1" Margin="12,8"
+                                Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Shortcut list (shared control) -->
+            <controls:ShortcutListControl Grid.Row="2"
+                                          Categories="{Binding FilteredCategories}"/>
+
+            <!-- Footer: Edit + Settings buttons -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal"
+                        HorizontalAlignment="Center" Margin="8">
+                <Button Content="Edit" Command="{Binding EditProfileCommand}"
+                        Style="{StaticResource FooterButton}" Margin="4,0"/>
+                <Button Content="Settings" Command="{Binding OpenSettingsCommand}"
+                        Style="{StaticResource FooterButton}" Margin="4,0"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

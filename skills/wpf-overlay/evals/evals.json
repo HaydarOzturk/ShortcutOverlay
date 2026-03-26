@@ -1,0 +1,23 @@
+{
+  "skill_name": "wpf-overlay",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write me the WindowDetectionService class that hooks into Windows to detect which application is currently in the foreground. It needs to handle Desktop, File Explorer, UWP apps, and Windows Terminal specially.",
+      "expected_output": "A complete C# class using SetWinEventHook with proper delegate pinning, special-case detection for explorer/UWP/Terminal, and ActiveAppChanged event. Should NOT use polling.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create the floating widget overlay window — it should be transparent, always on top, draggable, and show a list of shortcuts grouped by category. Include the XAML and code-behind.",
+      "expected_output": "XAML with AllowsTransparency=True, WindowStyle=None, Topmost=True. Code-behind with ForceTopmost via SetWindowPos, HideFromAltTab, and DragMove. Uses ShortcutListControl for the content.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I just finished implementing the HotkeyService and ProfileManager. What should I do to save my work? Also, I'm done with the core foundation phase — what's next for version control?",
+      "expected_output": "Should provide specific git add/commit/push commands with conventional commit messages. Should suggest creating a PR for phase-1, merging to main, tagging v0.1.0, and creating a new branch for phase-2.",
+      "files": []
+    }
+  ]
+}

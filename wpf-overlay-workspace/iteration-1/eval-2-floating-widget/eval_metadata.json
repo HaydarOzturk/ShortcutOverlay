@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "floating-widget-overlay",
+  "prompt": "Create the floating widget overlay window — it should be transparent, always on top, draggable, and show a list of shortcuts grouped by category. Include the XAML and code-behind.",
+  "assertions": [
+    {"text": "XAML sets AllowsTransparency=True and WindowStyle=None", "type": "required"},
+    {"text": "XAML sets Topmost=True and ShowInTaskbar=False", "type": "required"},
+    {"text": "Code-behind applies ForceTopmost fix via SetWindowPos P/Invoke", "type": "required"},
+    {"text": "Code-behind hides window from Alt+Tab via WS_EX_TOOLWINDOW", "type": "required"},
+    {"text": "Implements drag-to-move via DragMove() on MouseLeftButtonDown", "type": "required"},
+    {"text": "Shortcuts are grouped by category in the UI", "type": "required"},
+    {"text": "Implements IOverlayMode interface (ShowOverlay, HideOverlay, ToggleVisibility)", "type": "preferred"},
+    {"text": "Uses data binding to a ViewModel rather than hardcoded data", "type": "preferred"}
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "profileId": "cmd",
+  "displayName": "Command Prompt",
+  "processNames": ["cmd"],
+  "icon": "cmd.png",
+  "categories": [
+    {
+      "name": "Navigation",
+      "shortcuts": [
+        { "keys": "Tab", "description": "Auto-complete file/folder names", "tags": ["autocomplete"] },
+        { "keys": "Up/Down", "description": "Scroll through command history", "tags": ["history"] },
+        { "keys": "F7", "description": "Show command history list", "tags": ["history", "list"] },
+        { "keys": "F3", "description": "Repeat last command character by character", "tags": ["repeat"] },
+        { "keys": "Esc", "description": "Clear current command line", "tags": ["clear"] }
+      ]
+    },
+    {
+      "name": "Editing",
+      "shortcuts": [
+        { "keys": "Ctrl+C", "description": "Cancel running command / copy text", "tags": ["cancel", "copy"] },
+        { "keys": "Ctrl+V", "description": "Paste from clipboard", "tags": ["paste"] },
+        { "keys": "Home", "description": "Move cursor to start of line", "tags": ["cursor"] },
+        { "keys": "End", "description": "Move cursor to end of line", "tags": ["cursor"] },
+        { "keys": "Ctrl+Left/Right", "description": "Move cursor one word left/right", "tags": ["cursor", "word"] },
+        { "keys": "Ctrl+Backspace", "description": "Delete word before cursor", "tags": ["delete", "word"] }
+      ]
+    },
+    {
+      "name": "Selection & Display",
+      "shortcuts": [
+        { "keys": "Ctrl+A", "description": "Select all text in buffer", "tags": ["select"] },
+        { "keys": "Ctrl+M", "description": "Enter Mark mode for selection", "tags": ["mark", "select"] },
+        { "keys": "Ctrl+F", "description": "Open Find dialog", "tags": ["search", "find"] },
+        { "keys": "Alt+Enter", "description": "Toggle full-screen mode", "tags": ["fullscreen"] },
+        { "keys": "Ctrl+Scroll", "description": "Zoom in/out (resize text)", "tags": ["zoom"] }
+      ]
+    },
+    {
+      "name": "Useful Commands",
+      "shortcuts": [
+        { "keys": "cls", "description": "Clear the screen", "tags": ["clear", "screen"] },
+        { "keys": "doskey /history", "description": "Show full command history", "tags": ["history"] },
+        { "keys": "dir /s /b", "description": "List all files recursively", "tags": ["files", "list"] },
+        { "keys": "cd /d", "description": "Change directory (incl. drive letter)", "tags": ["navigate"] }
+      ]
+    }
+  ]
+}

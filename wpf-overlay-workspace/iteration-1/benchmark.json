@@ -1,0 +1,92 @@
+{
+  "skill_name": "wpf-overlay + git-workflow",
+  "iteration": 1,
+  "timestamp": "2026-03-26T03:30:00Z",
+  "configurations": [
+    {
+      "name": "with_skill",
+      "label": "With Skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "window-detection-service",
+          "pass_rate": 1.0,
+          "passed": 8,
+          "total": 8,
+          "duration_seconds": 23.6,
+          "total_tokens": 33820
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "floating-widget-overlay",
+          "pass_rate": 1.0,
+          "passed": 8,
+          "total": 8,
+          "duration_seconds": 29.0,
+          "total_tokens": 41863
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "git-version-control",
+          "pass_rate": 1.0,
+          "passed": 8,
+          "total": 8,
+          "duration_seconds": 17.1,
+          "total_tokens": 26547
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_duration_seconds": 23.2,
+        "mean_tokens": 34077
+      }
+    },
+    {
+      "name": "without_skill",
+      "label": "Without Skill (Baseline)",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "window-detection-service",
+          "pass_rate": 0.25,
+          "passed": 2,
+          "total": 8,
+          "duration_seconds": 21.0,
+          "total_tokens": 25286
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "floating-widget-overlay",
+          "pass_rate": 0.375,
+          "passed": 3,
+          "total": 8,
+          "duration_seconds": 24.3,
+          "total_tokens": 25903
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "git-version-control",
+          "pass_rate": 0.625,
+          "passed": 5,
+          "total": 8,
+          "duration_seconds": 11.9,
+          "total_tokens": 23299
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.417,
+        "stddev_pass_rate": 0.154,
+        "mean_duration_seconds": 19.1,
+        "mean_tokens": 24829
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate_improvement": "+58.3 percentage points",
+    "pass_rate_with_skill": "100%",
+    "pass_rate_without_skill": "41.7%",
+    "token_overhead": "+37% more tokens with skill",
+    "time_overhead": "+21% more time with skill"
+  }
+}

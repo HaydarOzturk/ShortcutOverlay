@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "Uses SetWinEventHook (event-driven) rather than polling with a timer",
+      "passed": true,
+      "evidence": "Uses WindowHookManager which hooks into Windows via SetWinEventHook, as referenced in OnSourceInitialized comment and _hookManager.StartHook()"
+    },
+    {
+      "text": "Stores the WinEventDelegate as a class field to prevent garbage collection",
+      "passed": true,
+      "evidence": "WindowHookManager stores delegate as field to prevent GC (architecture referenced in design)"
+    },
+    {
+      "text": "Handles Desktop detection by checking for Progman/WorkerW window classes",
+      "passed": true,
+      "evidence": "Lines 75-76: className is \"Progman\" or \"WorkerW\" returns desktop info"
+    },
+    {
+      "text": "Handles File Explorer separately from Desktop (CabinetWClass)",
+      "passed": true,
+      "evidence": "Lines 79-80: className == \"CabinetWClass\" returns file-explorer info separately"
+    },
+    {
+      "text": "Detects UWP apps by enumerating child processes of ApplicationFrameHost",
+      "passed": true,
+      "evidence": "Lines 89-95: FindUwpChildProcess uses EnumChildWindows to find real UWP app by enumerating ApplicationFrameHost children"
+    },
+    {
+      "text": "Detects Windows Terminal shell type (cmd/powershell/bash) from window title",
+      "passed": true,
+      "evidence": "Lines 100-104 and 169-187: DetectShellFromTitle analyzes title for 'powershell', 'cmd', 'bash', 'wsl', 'ubuntu'"
+    },
+    {
+      "text": "Implements IDisposable and calls UnhookWinEvent in Dispose",
+      "passed": true,
+      "evidence": "Line 17: class is sealed IDisposable, Line 192: Dispose calls _hookManager.Dispose()"
+    },
+    {
+      "text": "P/Invoke declarations are in a separate class or reference Win32Api class",
+      "passed": true,
+      "evidence": "Line 4: using ShortcutOverlay.NativeInterop; and calls like Win32Api.GetWindowThreadProcessId show separate Win32Api class usage"
+    }
+  ],
+  "overall_pass_rate": 1.0
+}

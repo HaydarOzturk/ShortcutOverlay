@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "XAML sets AllowsTransparency=True and WindowStyle=None",
+      "passed": true,
+      "evidence": "Lines 8-9: AllowsTransparency=\"True\" and WindowStyle=\"None\""
+    },
+    {
+      "text": "XAML sets Topmost=True and ShowInTaskbar=False",
+      "passed": true,
+      "evidence": "Lines 10-11: Topmost=\"True\" and ShowInTaskbar=\"False\""
+    },
+    {
+      "text": "Code-behind applies ForceTopmost fix via SetWindowPos P/Invoke",
+      "passed": true,
+      "evidence": "Lines 62-70: ForceTopmost method calls Win32Api.SetWindowPos with HWND_TOPMOST"
+    },
+    {
+      "text": "Code-behind hides window from Alt+Tab via WS_EX_TOOLWINDOW",
+      "passed": true,
+      "evidence": "Lines 78-85: HideFromAltTab sets WS_EX_TOOLWINDOW extended style via GetWindowLong/SetWindowLong"
+    },
+    {
+      "text": "Implements drag-to-move via DragMove() on MouseLeftButtonDown",
+      "passed": true,
+      "evidence": "Lines 47-52: Window_MouseLeftButtonDown event calls DragMove() when left button is pressed"
+    },
+    {
+      "text": "Shortcuts are grouped by category in the UI",
+      "passed": true,
+      "evidence": "Line 50: ShortcutListControl uses Categories binding for grouped display"
+    },
+    {
+      "text": "Implements IOverlayMode interface (ShowOverlay, HideOverlay, ToggleVisibility)",
+      "passed": true,
+      "evidence": "Line 23: class FloatingWidgetWindow : Window, IOverlayMode; Lines 92-115: implements ShowOverlay, HideOverlay, ToggleVisibility"
+    },
+    {
+      "text": "Uses data binding to a ViewModel rather than hardcoded data",
+      "passed": true,
+      "evidence": "Line 28: DataContext = viewModel; Line 33-50: Bindings to viewModel properties (CurrentAppName, AllProfiles, SearchFilter, FilteredCategories)"
+    }
+  ],
+  "overall_pass_rate": 1.0
+}
