@@ -36,6 +36,10 @@ public class ThemePalette
     public required Color ScrollbarThumb { get; init; }
     public required Color ScrollbarTrack { get; init; }
 
+    // App icon adaptive gradient — the icon background shifts to match the theme
+    public required Color IconGradientStart { get; init; }
+    public required Color IconGradientEnd { get; init; }
+
     private static Color C(string hex) => (Color)ColorConverter.ConvertFromString(hex);
 
     // ── Classic ──
@@ -52,6 +56,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10FFFFFF"), FooterButtonHover = C("#20FFFFFF"), FooterButtonText = C("#90FFFFFF"),
         AccentColor = C("#FF0A84FF"), AccentColorSubtle = C("#200A84FF"),
         ScrollbarThumb = C("#25FFFFFF"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFD4935A"), IconGradientEnd = C("#FF5BC0B0"),
     };
 
     public static ThemePalette ClassicLight => new()
@@ -67,6 +72,7 @@ public class ThemePalette
         FooterButtonBackground = C("#08000000"), FooterButtonHover = C("#15000000"), FooterButtonText = C("#80000000"),
         AccentColor = C("#FF007AFF"), AccentColorSubtle = C("#20007AFF"),
         ScrollbarThumb = C("#20000000"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFC08040"), IconGradientEnd = C("#FF40A090"),
     };
 
     // ── Midnight Blue ──
@@ -83,6 +89,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10304880"), FooterButtonHover = C("#20406EBB"), FooterButtonText = C("#90A0C0EE"),
         AccentColor = C("#FF3B82F6"), AccentColorSubtle = C("#203B82F6"),
         ScrollbarThumb = C("#25406EBB"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF4A6FC0"), IconGradientEnd = C("#FF2040A0"),
     };
 
     public static ThemePalette MidnightBlueLight => new()
@@ -98,6 +105,7 @@ public class ThemePalette
         FooterButtonBackground = C("#082050A0"), FooterButtonHover = C("#15406EBB"), FooterButtonText = C("#80183060"),
         AccentColor = C("#FF2563EB"), AccentColorSubtle = C("#202563EB"),
         ScrollbarThumb = C("#20406EBB"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF6088D0"), IconGradientEnd = C("#FF3060C0"),
     };
 
     // ── Rose Gold ──
@@ -114,6 +122,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10804050"), FooterButtonHover = C("#20C06878"), FooterButtonText = C("#90E0A0B0"),
         AccentColor = C("#FFF472B6"), AccentColorSubtle = C("#20F472B6"),
         ScrollbarThumb = C("#25C06878"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFE07090"), IconGradientEnd = C("#FFB04870"),
     };
 
     public static ThemePalette RoseGoldLight => new()
@@ -129,6 +138,7 @@ public class ThemePalette
         FooterButtonBackground = C("#08A04858"), FooterButtonHover = C("#15C06878"), FooterButtonText = C("#80602838"),
         AccentColor = C("#FFEC4899"), AccentColorSubtle = C("#20EC4899"),
         ScrollbarThumb = C("#20C06878"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFF08098"), IconGradientEnd = C("#FFC06080"),
     };
 
     // ── Ocean Teal ──
@@ -145,6 +155,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10207060"), FooterButtonHover = C("#2030A890"), FooterButtonText = C("#9090D0C0"),
         AccentColor = C("#FF2DD4BF"), AccentColorSubtle = C("#202DD4BF"),
         ScrollbarThumb = C("#2530A890"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF30C0A8"), IconGradientEnd = C("#FF1A8878"),
     };
 
     public static ThemePalette OceanTealLight => new()
@@ -160,6 +171,7 @@ public class ThemePalette
         FooterButtonBackground = C("#08208870"), FooterButtonHover = C("#1530A890"), FooterButtonText = C("#80184838"),
         AccentColor = C("#FF0D9488"), AccentColorSubtle = C("#200D9488"),
         ScrollbarThumb = C("#2030A890"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF40D0B8"), IconGradientEnd = C("#FF20A890"),
     };
 
     // ── Forest Green ──
@@ -176,6 +188,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10387030"), FooterButtonHover = C("#2058A850"), FooterButtonText = C("#90A0D098"),
         AccentColor = C("#FF34D399"), AccentColorSubtle = C("#2034D399"),
         ScrollbarThumb = C("#2558A850"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF40C870"), IconGradientEnd = C("#FF208848"),
     };
 
     public static ThemePalette ForestGreenLight => new()
@@ -191,6 +204,7 @@ public class ThemePalette
         FooterButtonBackground = C("#08408838"), FooterButtonHover = C("#1558A850"), FooterButtonText = C("#80284820"),
         AccentColor = C("#FF059669"), AccentColorSubtle = C("#20059669"),
         ScrollbarThumb = C("#2058A850"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FF50D880"), IconGradientEnd = C("#FF30A858"),
     };
 
     // ── Sunset Amber ──
@@ -207,6 +221,7 @@ public class ThemePalette
         FooterButtonBackground = C("#10806020"), FooterButtonHover = C("#20C09038"), FooterButtonText = C("#90D0B070"),
         AccentColor = C("#FFFBBF24"), AccentColorSubtle = C("#20FBBF24"),
         ScrollbarThumb = C("#25C09038"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFE8A030"), IconGradientEnd = C("#FFC07818"),
     };
 
     public static ThemePalette SunsetAmberLight => new()
@@ -222,6 +237,7 @@ public class ThemePalette
         FooterButtonBackground = C("#08A07828"), FooterButtonHover = C("#15C09038"), FooterButtonText = C("#80503818"),
         AccentColor = C("#FFD97706"), AccentColorSubtle = C("#20D97706"),
         ScrollbarThumb = C("#20C09038"), ScrollbarTrack = C("#00000000"),
+        IconGradientStart = C("#FFF0B040"), IconGradientEnd = C("#FFD09020"),
     };
 
     /// <summary>

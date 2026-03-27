@@ -20,17 +20,27 @@ public class TrayIconService : IDisposable
     {
         _taskbarIcon = new TaskbarIcon
         {
-            ToolTipText = "ShortcutOverlay — Ctrl+Shift+S to toggle"
+            ToolTipText = "Hotglass — Ctrl+Shift+S to toggle"
         };
 
-        // Use the default application icon
+        // Load custom app icon from embedded resource
         try
         {
-            _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
+            var iconUri = new Uri("pack://application:,,,/Resources/Icons/app-icon.ico", UriKind.Absolute);
+            var streamInfo = Application.GetResourceStream(iconUri);
+            if (streamInfo != null)
+            {
+                _taskbarIcon.Icon = new System.Drawing.Icon(streamInfo.Stream);
+            }
+            else
+            {
+                _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
+            }
         }
         catch
         {
             // Fallback: icon may fail on some configurations, tray still works
+            _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
             System.Diagnostics.Debug.WriteLine("Could not set tray icon; using default.");
         }
 

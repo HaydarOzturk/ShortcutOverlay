@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- <ApplicationIcon>Resources\Icons\app-icon.ico</ApplicationIcon> -->
+    <ApplicationIcon>Resources\Icons\app-icon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>ShortcutOverlay</AssemblyName>
     <RootNamespace>ShortcutOverlay</RootNamespace>
@@ -25,6 +25,18 @@
   <ItemGroup>
     <None Remove="Resources\DefaultProfiles\*.json" />
     <EmbeddedResource Include="Resources\DefaultProfiles\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Icons\app-icon.ico" />
+    <Resource Include="Resources\Icons\app-icon.png" />
+    <Resource Include="Resources\Icons\app-icon-16.png" />
+    <Resource Include="Resources\Icons\app-icon-32.png" />
+    <Resource Include="Resources\Icons\app-icon-48.png" />
+    <Resource Include="Resources\Icons\app-icon-256.png" />
+    <Resource Include="Resources\Icons\symbol-32.png" />
+    <Resource Include="Resources\Icons\symbol-48.png" />
+    <Resource Include="Resources\Icons\symbol-256.png" />
   </ItemGroup>
 
 </Project>

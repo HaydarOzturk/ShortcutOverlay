@@ -88,11 +88,10 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Ellipse Grid.Column="0"
-                             Width="10" Height="10"
-                             Fill="{DynamicResource AccentColor}"
-                             Margin="0,0,8,0"
-                             VerticalAlignment="Center" />
+                    <controls:AppIconControl Grid.Column="0"
+                                              Width="22" Height="22"
+                                              Margin="0,0,8,0"
+                                              VerticalAlignment="Center" />
 
                     <TextBlock Grid.Column="1"
                                Text="{Binding CurrentAppName}"

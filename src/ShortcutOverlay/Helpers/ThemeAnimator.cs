@@ -42,6 +42,7 @@ public static class ThemeAnimator
         "FooterButtonBackground", "FooterButtonHover", "FooterButtonText",
         "AccentColor", "AccentColorSubtle",
         "ScrollbarThumb", "ScrollbarTrack",
+        "IconGradientStart", "IconGradientEnd",
     };
 
     private static ThemePalette? _currentPalette;
@@ -185,6 +186,8 @@ public static class ThemeAnimator
             AccentColorSubtle = Snap("AccentColorSubtle"),
             ScrollbarThumb = Snap("ScrollbarThumb"),
             ScrollbarTrack = Snap("ScrollbarTrack"),
+            IconGradientStart = Snap("IconGradientStart"),
+            IconGradientEnd = Snap("IconGradientEnd"),
         };
     }
 
@@ -355,6 +358,8 @@ public static class ThemeAnimator
         "AccentColorSubtle" => p.AccentColorSubtle,
         "ScrollbarThumb" => p.ScrollbarThumb,
         "ScrollbarTrack" => p.ScrollbarTrack,
+        "IconGradientStart" => p.IconGradientStart,
+        "IconGradientEnd" => p.IconGradientEnd,
         _ => Colors.Transparent,
     };
 }
