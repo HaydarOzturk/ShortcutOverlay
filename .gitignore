@@ -48,3 +48,11 @@ Desktop.ini
 *.pidb
 *.dbmdl
 *.jfm
+
+# Claude / AI artifacts
+skills/
+*.skill
+PHASE*-PLAN.md
+*-Plan.md
+wpf-overlay-workspace/
+.claude/
