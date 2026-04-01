@@ -5,7 +5,6 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Topmost="True"
         ShowInTaskbar="False"
         Width="340"
         Height="600"
@@ -96,34 +95,50 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Adaptive Hotglass icon -->
+                    <!-- Hotglass adaptive icon — always shown -->
                     <controls:AppIconControl Grid.Column="0"
                                               Width="22" Height="22"
                                               Margin="0,0,8,0"
                                               VerticalAlignment="Center" />
 
-                    <!-- App name — truncated, compact -->
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding CurrentAppName}"
-                               Foreground="{DynamicResource PrimaryText}"
-                               FontWeight="SemiBold"
-                               FontSize="13"
-                               FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
+                    <!-- App name with small detected app icon -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Small detected app icon (from active window) -->
+                        <Image Source="{Binding CurrentAppIcon}"
+                               Width="11" Height="11"
+                               Margin="0,0,4,0"
                                VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"
-                               MaxWidth="200"
-                               Effect="{StaticResource TextShadowLight}" />
+                               Visibility="{Binding CurrentAppIcon, Converter={StaticResource NullToCollapsedConverter}}"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                        <TextBlock Text="{Binding CurrentAppName}"
+                                   Foreground="{DynamicResource PrimaryText}"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="190"
+                                   Effect="{StaticResource TextShadowLight}" />
+                    </StackPanel>
 
-                    <!-- Pin toggle icon -->
-                    <TextBlock x:Name="PinIcon"
-                               Grid.Column="2"
-                               Text="📌"
-                               FontSize="12"
-                               VerticalAlignment="Center"
-                               Cursor="Hand"
-                               Margin="0,0,10,0"
-                               MouseLeftButtonDown="PinIcon_Click"
-                               ToolTip="Toggle always on top" />
+                    <!-- Pin toggle icon — with glow for dark mode visibility -->
+                    <Border Grid.Column="2"
+                            Background="Transparent"
+                            Cursor="Hand"
+                            Margin="0,0,8,0"
+                            Padding="2"
+                            MouseLeftButtonDown="PinIcon_Click">
+                        <TextBlock x:Name="PinIcon"
+                                   Text="📌"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   ToolTip="Pin to lock position">
+                            <TextBlock.Effect>
+                                <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6" />
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Border>
 
                     <!-- Menu icon — opens context menu -->
                     <TextBlock x:Name="MenuIcon"
@@ -160,7 +175,8 @@
             </Border>
 
             <!-- Shortcut list: shared glass control -->
-            <controls:ShortcutListControl Grid.Row="2"
+            <controls:ShortcutListControl x:Name="ShortcutList"
+                                          Grid.Row="2"
                                           Categories="{Binding FilteredCategories}" />
         </Grid>
     </Border>

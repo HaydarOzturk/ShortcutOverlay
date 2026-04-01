@@ -4,16 +4,16 @@
              Width="24" Height="24">
 
     <!-- Adaptive Hotglass icon: rounded-rect gradient background + white symbol overlay.
-         The gradient colors bind to DynamicResource keys that ThemeAnimator transitions
-         seamlessly, so the icon color shifts with the theme without any extra code. -->
+         The gradient stops use static fallback colors; the code-behind (AppIconControl.xaml.cs)
+         syncs them to the current theme's IconGradientStart/End brushes at 60fps. -->
 
     <Grid>
         <!-- Gradient background with rounded corners -->
         <Border CornerRadius="5" ClipToBounds="True">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop x:Name="GradStop1" Color="{Binding Source={x:Static Application.Current}, Path=Resources[IconGradientStartColor]}" Offset="0" />
-                    <GradientStop x:Name="GradStop2" Color="{Binding Source={x:Static Application.Current}, Path=Resources[IconGradientEndColor]}" Offset="1" />
+                    <GradientStop x:Name="GradStop1" Color="#FFD4935A" Offset="0" />
+                    <GradientStop x:Name="GradStop2" Color="#FF5BC0B0" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
 

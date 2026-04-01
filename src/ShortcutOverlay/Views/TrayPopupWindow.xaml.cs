@@ -18,6 +18,7 @@ public partial class TrayPopupWindow : Window, IOverlayMode
     {
         InitializeComponent();
         DataContext = viewModel;
+        Loaded += (_, _) => PositionNearTray();
         Deactivated += Window_Deactivated;
     }
 
@@ -42,7 +43,7 @@ public partial class TrayPopupWindow : Window, IOverlayMode
     {
         var handle = new WindowInteropHelper(this).Handle;
         var exStyle = Win32Api.GetWindowLong(handle, Win32Api.GWL_EXSTYLE);
-        exStyle |= Win32Api.WS_EX_TOOLWINDOW | Win32Api.WS_EX_NOACTIVATE;
+        exStyle |= Win32Api.WS_EX_TOOLWINDOW;
         Win32Api.SetWindowLong(handle, Win32Api.GWL_EXSTYLE, exStyle);
     }
 
@@ -131,17 +132,20 @@ public partial class TrayPopupWindow : Window, IOverlayMode
         }
     }
 
-    private void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
+    private async void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem item && item.Tag is string tag)
+        if (sender is MenuItem item && item.Tag is string mode)
         {
-            System.Diagnostics.Debug.WriteLine($"Display mode switch requested: {tag}");
+            var settings = SettingsService.Instance;
+            var newSettings = settings.Current with { DisplayMode = mode };
+            await settings.UpdateAsync(newSettings);
+            App.SwitchDisplayMode(mode);
         }
     }
 
     private void About_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("ShortcutOverlay v1.0\nA minimalist keyboard shortcut overlay.",
+        MessageBox.Show("Hotglass v1.0\nAn interactive keyboard shortcut overlay for Windows.",
             "About", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 

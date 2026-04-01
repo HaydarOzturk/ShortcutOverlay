@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
 using ShortcutOverlay.Models;
 using ShortcutOverlay.Services;
 using ShortcutOverlay.Views;
@@ -25,6 +26,9 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string currentAppName = "No app detected";
+
+    [ObservableProperty]
+    private BitmapSource? currentAppIcon;
 
     [ObservableProperty]
     private string searchFilter = string.Empty;
@@ -58,11 +62,37 @@ public partial class MainViewModel : ObservableObject
     private void OnActiveAppChanged(ActiveAppInfo appInfo)
     {
         CurrentAppName = string.IsNullOrEmpty(appInfo.ProcessName) ? "No app detected" : appInfo.DisplayName;
+        CurrentAppIcon = appInfo.Icon; // null is fine — XAML handles fallback
 
         var profile = _profileManager.GetProfileForProcess(appInfo.ProcessName);
-        CurrentProfile = profile;
 
-        ApplyFilter();
+        if (profile != null)
+        {
+            // Found a matching profile — show it
+            CurrentProfile = profile;
+            ApplyFilter();
+        }
+        else if (IsDesktopProcess(appInfo.ProcessName))
+        {
+            // Desktop / no active app — keep the last shown profile visible
+            // so the overlay isn't blank when the user is on the desktop.
+        }
+        else
+        {
+            // Active app with no shortcuts profile — show "no shortcuts"
+            CurrentProfile = null;
+            FilteredCategories.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Returns true if the process name represents the desktop shell
+    /// (no real app in foreground).
+    /// </summary>
+    private static bool IsDesktopProcess(string processName)
+    {
+        return processName is "desktop" or "unknown" or ""
+            || processName.StartsWith("__desktop__", StringComparison.Ordinal);
     }
 
     partial void OnSearchFilterChanged(string value)
@@ -119,8 +149,13 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void OpenSettings()
     {
-        // TODO: Phase 3 — wire up settings dialog window
-        System.Diagnostics.Debug.WriteLine("Settings dialog not yet implemented (Phase 3).");
+        var settingsWindow = new SettingsWindow
+        {
+            Owner = System.Windows.Application.Current.Windows
+                .OfType<System.Windows.Window>()
+                .FirstOrDefault(w => w.IsActive) // parent to the active window
+        };
+        settingsWindow.ShowDialog();
     }
 
     [RelayCommand]

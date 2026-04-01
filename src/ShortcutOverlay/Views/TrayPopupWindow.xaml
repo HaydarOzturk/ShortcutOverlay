@@ -93,16 +93,23 @@
                                               Margin="0,0,8,0"
                                               VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding CurrentAppName}"
-                               Foreground="{DynamicResource PrimaryText}"
-                               FontWeight="SemiBold"
-                               FontSize="13"
-                               FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Image Source="{Binding CurrentAppIcon}"
+                               Width="11" Height="11"
+                               Margin="0,0,4,0"
                                VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"
-                               MaxWidth="200"
-                               Effect="{StaticResource TextShadowLight}" />
+                               Visibility="{Binding CurrentAppIcon, Converter={StaticResource NullToCollapsedConverter}}"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                        <TextBlock Text="{Binding CurrentAppName}"
+                                   Foreground="{DynamicResource PrimaryText}"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   FontFamily="SF Pro Display, Segoe UI Semibold, sans-serif"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="190"
+                                   Effect="{StaticResource TextShadowLight}" />
+                    </StackPanel>
 
                     <TextBlock Grid.Column="2"
                                Text="⋮"

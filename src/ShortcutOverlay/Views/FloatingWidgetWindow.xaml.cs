@@ -19,10 +19,39 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
 
     public bool IsOverlayVisible => _overlayVisible;
 
+    /// <summary>
+    /// Exposes the pinned state so ShortcutListControl can bind to it
+    /// and enable click-to-execute in pin mode.
+    /// </summary>
+    public bool IsPinnedMode => _isPinned;
+
+    /// <summary>
+    /// Sets the pin (position lock) state from external code (e.g., Settings dialog).
+    /// Updates both internal state and the pin icon visual.
+    /// </summary>
+    public void SetPinState(bool pinned)
+    {
+        _isPinned = pinned;
+        PinIcon.Text = _isPinned ? "📌" : "📍";
+        PinIcon.ToolTip = _isPinned ? "Unpin to allow dragging" : "Pin to lock position";
+        ShortcutList.IsPinned = _isPinned;
+    }
+
     public FloatingWidgetWindow(MainViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
+
+        // Load pinned state from persisted settings
+        _isPinned = SettingsService.Instance.Current.AlwaysOnTop;
+
+        // Sync the pin icon visual and shortcut list pin state on load
+        Loaded += (_, _) =>
+        {
+            PinIcon.Text = _isPinned ? "📌" : "📍";
+            PinIcon.ToolTip = _isPinned ? "Unpin to allow dragging" : "Pin to lock position";
+            ShortcutList.IsPinned = _isPinned;
+        };
 
         // Re-check brightness when the foreground app changes (profile or app name)
         viewModel.PropertyChanged += (_, args) =>
@@ -63,7 +92,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        if (_isPinned) ForceTopmost();
+        ForceTopmost(); // Overlay ALWAYS stays on top — pin only controls position lock
         HideFromAltTab();
 
         var myHwnd = new WindowInteropHelper(this).Handle;
@@ -93,14 +122,59 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     {
         var handle = new WindowInteropHelper(this).Handle;
         var exStyle = Win32Api.GetWindowLong(handle, Win32Api.GWL_EXSTYLE);
-        exStyle |= Win32Api.WS_EX_TOOLWINDOW | Win32Api.WS_EX_NOACTIVATE;
+        // Only WS_EX_TOOLWINDOW to hide from Alt+Tab — WS_EX_NOACTIVATE is removed
+        // so the window can receive keyboard focus (needed for search box input).
+        exStyle |= Win32Api.WS_EX_TOOLWINDOW;
         Win32Api.SetWindowLong(handle, Win32Api.GWL_EXSTYLE, exStyle);
     }
 
     private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        // When pinned, lock position — flash the pin icon to indicate locked state
+        if (_isPinned)
+        {
+            FlashPinIcon();
+            return;
+        }
+
         DragMove();
-        TriggerAdaptiveCheck();
+
+        // After DragMove() returns (blocking call), run adaptive check immediately
+        // — skip debounce since the drag is already complete and position is final.
+        RunAdaptiveCheck();
+
+        // Persist the new position
+        var settings = SettingsService.Instance;
+        settings.UpdateAsync(settings.Current with
+        {
+            FloatingPosition = new Models.PositionDto(Left, Top)
+        }).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Quick flash animation on the pin icon: dim → bright → normal over 400ms.
+    /// Uses DispatcherTimer to avoid WPF animation issues with frozen brushes.
+    /// </summary>
+    private void FlashPinIcon()
+    {
+        PinIcon.Opacity = 0.3;
+        PinIcon.ToolTip = "Unpin to move";
+
+        var flashTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
+        int step = 0;
+        flashTimer.Tick += (_, _) =>
+        {
+            step++;
+            if (step == 1)
+                PinIcon.Opacity = 1.0;
+            else
+            {
+                PinIcon.Opacity = 1.0;
+                PinIcon.ToolTip = "Unpin to allow dragging";
+                flashTimer.Stop();
+            }
+        };
+        flashTimer.Start();
     }
 
     // ── Icon tray click handlers ──
@@ -110,18 +184,14 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         e.Handled = true;
         _isPinned = !_isPinned;
         PinIcon.Text = _isPinned ? "📌" : "📍";
-        PinIcon.ToolTip = _isPinned ? "Unpin (disable always on top)" : "Pin (enable always on top)";
+        PinIcon.ToolTip = _isPinned ? "Unpin to allow dragging" : "Pin to lock position";
 
-        if (_isPinned)
-        {
-            Topmost = true;
-            ForceTopmost();
-        }
-        else
-        {
-            Topmost = false;
-            RemoveTopmost();
-        }
+        // Pin only controls position lock — overlay always stays on top.
+        // No topmost toggle here.
+
+        // Persist the setting
+        var settings = SettingsService.Instance;
+        settings.UpdateAsync(settings.Current with { AlwaysOnTop = _isPinned }).ConfigureAwait(false);
     }
 
     private void MenuIcon_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -157,6 +227,17 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
             var newSettings = settings.Current with { Theme = themeSetting };
             settings.UpdateAsync(newSettings).ConfigureAwait(false);
             ThemeManager.ApplyTheme(themeSetting);
+
+            // Start or stop the adaptive poll timer based on new theme mode
+            if (ThemeManager.IsAdaptiveMode)
+            {
+                StartAdaptivePolling();
+                TriggerAdaptiveCheck();
+            }
+            else
+            {
+                StopAdaptivePolling();
+            }
         }
     }
 
@@ -171,18 +252,24 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         }
     }
 
-    private void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
+    private async void DisplayModeMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem item && item.Tag is string tag)
+        if (sender is MenuItem item && item.Tag is string mode)
         {
-            // TODO: Wire up display mode switching via MainViewModel
-            System.Diagnostics.Debug.WriteLine($"Display mode switch requested: {tag}");
+            // Persist the new display mode
+            var settings = SettingsService.Instance;
+            var newSettings = settings.Current with { DisplayMode = mode };
+            await settings.UpdateAsync(newSettings);
+
+            // Switch to the new display mode
+            App.SwitchDisplayMode(mode);
         }
     }
 
     private void EditShortcuts_Click(object sender, RoutedEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine("Edit shortcuts not yet implemented.");
+        var editor = new ShortcutEditorWindow();
+        editor.Show();
     }
 
     private void Settings_Click(object sender, RoutedEventArgs e)
@@ -193,7 +280,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
 
     private void About_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("ShortcutOverlay v1.0\nA minimalist keyboard shortcut overlay.",
+        MessageBox.Show("Hotglass v1.0\nAn interactive keyboard shortcut overlay for Windows.",
             "About", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
@@ -376,6 +463,7 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
         {
             Show();
             Activate();
+            ForceTopmost(); // Re-assert topmost after show
             _overlayVisible = true;
             TriggerAdaptiveCheck();
             StartAdaptivePolling();
@@ -386,9 +474,31 @@ public partial class FloatingWidgetWindow : Window, IOverlayMode
     {
         if (_overlayVisible)
         {
+            // Close any child dialogs (Settings, Shortcut Editor) before hiding
+            CloseChildDialogs();
+
             Hide();
             _overlayVisible = false;
             StopAdaptivePolling();
+        }
+    }
+
+    /// <summary>
+    /// Closes all child dialog windows (Settings, Shortcut Editor) owned by
+    /// or associated with this overlay. Prevents orphaned dialogs when
+    /// the overlay is hidden via hotkey.
+    /// </summary>
+    private static void CloseChildDialogs()
+    {
+        var toClose = new List<Window>();
+        foreach (var win in Application.Current.Windows.OfType<Window>())
+        {
+            if (win is SettingsWindow || win is ShortcutEditorWindow)
+                toClose.Add(win);
+        }
+        foreach (var win in toClose)
+        {
+            try { win.Close(); } catch { /* ignore */ }
         }
     }
 

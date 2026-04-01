@@ -13,7 +13,7 @@ public record AppSettings
     public string FontSize { get; init; } = "medium";
     public PositionDto FloatingPosition { get; init; } = new(1500, 200);
     public int SidePanelWidth { get; init; } = 280;
-    public bool AlwaysOnTop { get; init; } = true;
+    public bool AlwaysOnTop { get; init; } = false;
 }
 
 public record PositionDto(double X, double Y);

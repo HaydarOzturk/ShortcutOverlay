@@ -48,15 +48,16 @@ public partial class App : Application
         // Get the view model
         var viewModel = Services.GetRequiredService<MainViewModel>();
 
-        // Create and show the floating widget window (default mode)
-        var window = Services.GetRequiredService<FloatingWidgetWindow>();
+        // Create and show the correct display mode window
+        var displayMode = settingsService.Current.DisplayMode;
+        Window window = CreateOverlayWindow(displayMode);
 
         // Apply saved opacity
         if (settingsService.Current.Opacity > 0 && settingsService.Current.Opacity <= 1.0)
             window.Opacity = settingsService.Current.Opacity;
 
         window.Show();
-        viewModel.ActiveOverlay = window;
+        viewModel.ActiveOverlay = (IOverlayMode)window;
 
         // Initialize hotkey service
         var hotkeyService = Services.GetRequiredService<HotkeyService>();
@@ -72,6 +73,52 @@ public partial class App : Application
         _trayIconService.ToggleOverlayRequested += () => viewModel.ActiveOverlay?.ToggleVisibility();
         _trayIconService.OpenSettingsRequested += () => viewModel.OpenSettingsCommand.Execute(null);
         _trayIconService.QuitRequested += () => Shutdown();
+    }
+
+    /// <summary>
+    /// Switches the overlay from one display mode to another.
+    /// Closes the current overlay window, creates the new one, and transfers
+    /// the hotkey registration.
+    /// </summary>
+    public static void SwitchDisplayMode(string newMode)
+    {
+        var viewModel = Services.GetRequiredService<MainViewModel>();
+        var hotkeyService = Services.GetRequiredService<HotkeyService>();
+        var settingsService = Services.GetRequiredService<SettingsService>();
+
+        // Close current overlay
+        if (viewModel.ActiveOverlay is Window oldWindow)
+        {
+            oldWindow.Close();
+        }
+
+        // Create the new window
+        Window newWindow = CreateOverlayWindow(newMode);
+
+        // Apply saved opacity
+        if (settingsService.Current.Opacity > 0 && settingsService.Current.Opacity <= 1.0)
+            newWindow.Opacity = settingsService.Current.Opacity;
+
+        newWindow.Show();
+
+        // Transfer hotkey to new window
+        hotkeyService.Reinitialize(newWindow);
+
+        // Set as active overlay
+        viewModel.ActiveOverlay = (IOverlayMode)newWindow;
+    }
+
+    /// <summary>
+    /// Creates the correct overlay window type based on the display mode string.
+    /// </summary>
+    private static Window CreateOverlayWindow(string displayMode)
+    {
+        return displayMode?.ToLowerInvariant() switch
+        {
+            "sidepanel" => Services.GetRequiredService<SidePanelWindow>(),
+            "tray" => Services.GetRequiredService<TrayPopupWindow>(),
+            _ => Services.GetRequiredService<FloatingWidgetWindow>()
+        };
     }
 
     protected override void OnExit(ExitEventArgs e)

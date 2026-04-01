@@ -58,6 +58,43 @@ public sealed class HotkeyService : IDisposable
     }
 
     /// <summary>
+    /// Moves the hotkey registrations to a new window.
+    /// Called when switching display modes (floating → side panel → tray).
+    /// </summary>
+    public void Reinitialize(Window newWindow)
+    {
+        // Save registered hotkeys
+        var savedHotkeys = _registeredHotkeys.ToList();
+
+        // Unregister from old window
+        foreach (var kvp in savedHotkeys)
+            Win32Api.UnregisterHotKey(_windowHandle, kvp.Key);
+
+        // Remove old hook
+        if (_hwndSource != null)
+        {
+            _hwndSource.RemoveHook(WndProc);
+            _hwndSource = null;
+        }
+
+        // Initialize on new window
+        var source = PresentationSource.FromVisual(newWindow) as HwndSource;
+        if (source == null) return;
+
+        _windowHandle = source.Handle;
+        _hwndSource = source;
+        _hwndSource.AddHook(WndProc);
+
+        // Re-register all hotkeys on the new window
+        _registeredHotkeys.Clear();
+        foreach (var kvp in savedHotkeys)
+        {
+            if (Win32Api.RegisterHotKey(_windowHandle, kvp.Key, kvp.Value.modifiers, kvp.Value.key))
+                _registeredHotkeys[kvp.Key] = kvp.Value;
+        }
+    }
+
+    /// <summary>
     /// Unregisters a specific hotkey by its ID.
     /// </summary>
     private bool UnregisterHotkey(int hotkeyId)

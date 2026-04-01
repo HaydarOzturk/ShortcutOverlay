@@ -1,6 +1,7 @@
 <Application x:Class="ShortcutOverlay.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:ShortcutOverlay.Helpers"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,6 +10,8 @@
                 <ResourceDictionary Source="Resources/Styles/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <DropShadowEffect x:Key="DropShadowEffect" BlurRadius="20" ShadowDepth="2" Opacity="0.3" Color="Black"/>
+            <helpers:NullToCollapsedConverter x:Key="NullToCollapsedConverter"/>
+            <helpers:NullToVisibleConverter x:Key="NullToVisibleConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

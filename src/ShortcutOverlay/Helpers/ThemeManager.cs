@@ -206,8 +206,21 @@ public static class ThemeManager
 
             NativeInterop.Win32Api.GetWindowThreadProcessId(hwnd, out var pid);
             if (pid == 0) return string.Empty;
-            using var proc = Process.GetProcessById((int)pid);
-            return proc.ProcessName.ToLowerInvariant();
+
+            try
+            {
+                using var proc = Process.GetProcessById((int)pid);
+                return proc.ProcessName.ToLowerInvariant();
+            }
+            catch
+            {
+                // Elevated process — use window title hash as cache key
+                // so adaptive theme still works for admin apps
+                var title = new StringBuilder(256);
+                NativeInterop.Win32Api.GetWindowText(hwnd, title, 256);
+                var titleStr = title.ToString();
+                return string.IsNullOrEmpty(titleStr) ? "__elevated__" : $"__elevated_{titleStr.GetHashCode():X}__";
+            }
         }
         catch
         {
